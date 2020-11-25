@@ -55,7 +55,7 @@ const useStyles = makeStyles(
     sidebar: {
       gridArea: 'sidebar',
       padding: 0,
-      minWidth: 240,
+      // minWidth: 240,
       maxWidth: 250,
     },
 
@@ -140,18 +140,17 @@ const Dashboard = props => {
       </Helmet>
 
       <div className={clsx(classes.gridItem, classes.headerLeft)}>
-        <div className={classes.logoContainer}>
-          <Button component={Link} to="/">
-            Pacman Training
-          </Button>
-        </div>
+        <div className={classes.logoContainer}></div>
       </div>
       <div className={clsx(classes.gridItem, classes.headerRight)}>
+        <Button component={Link} to="/">
+          Pacman Training
+        </Button>
         <div className={classes.headerButtonsContainer}>SETTINGS</div>
       </div>
       <div className={clsx(classes.gridItem, classes.sidebar)}>
         {/* <LeftSidebar {...props.match} /> */}
-        LEFT SIDE BAR
+        {/* LEFT SIDE BAR */}
       </div>
       <div className={clsx(classes.gridItem, classes.content)}>
         <Content />

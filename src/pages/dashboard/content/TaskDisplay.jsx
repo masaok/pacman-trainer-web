@@ -54,9 +54,9 @@ const TaskDisplay = props => {
       <Helmet>
         <title>Task Display {SITE_TITLE_POSTFIX}</title>
       </Helmet>
-      <div className={classes.mazeContainer}>
+      {/* <div className={classes.mazeContainer}>
         <RandomMaze seed={seed} />
-      </div>
+      </div> */}
       <div className={classes.mazeContainer}>
         <RecursiveBacktrackingMaze seed={seed} />
       </div>

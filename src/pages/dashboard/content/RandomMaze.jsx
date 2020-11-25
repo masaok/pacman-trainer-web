@@ -165,19 +165,39 @@ const RandomMaze = props => {
     <div className={classes.root}>
       {maze.map((row, rowIndex) => {
         return (
-          <div className={classes.mazeRow}>
+          <div className={classes.mazeRow} key={rowIndex}>
             {maze[rowIndex].map((item, colIndex) => {
               switch (item) {
                 case ' ':
-                  return <div className={clsx(classes.mazeBlock, classes.mazeSpace)}>{item}</div>
+                  return (
+                    <div className={clsx(classes.mazeBlock, classes.mazeSpace)} key={colIndex}>
+                      {item}
+                    </div>
+                  )
                 case 'X':
-                  return <div className={clsx(classes.mazeBlock, classes.mazeWall)}>{item}</div>
+                  return (
+                    <div className={clsx(classes.mazeBlock, classes.mazeWall)} key={colIndex}>
+                      {item}
+                    </div>
+                  )
                 case 'P':
-                  return <div className={clsx(classes.mazeBlock, classes.mazePacman)}>{item}</div>
+                  return (
+                    <div className={clsx(classes.mazeBlock, classes.mazePacman)} key={colIndex}>
+                      {item}
+                    </div>
+                  )
                 case 'G':
-                  return <div className={clsx(classes.mazeBlock, classes.mazeGhost)}>{item}</div>
+                  return (
+                    <div className={clsx(classes.mazeBlock, classes.mazeGhost)} key={colIndex}>
+                      {item}
+                    </div>
+                  )
                 default:
-                  return <div className={clsx(classes.mazeBlock, classes.mazeError)}>{item}</div>
+                  return (
+                    <div className={clsx(classes.mazeBlock, classes.mazeError)} key={colIndex}>
+                      {item}
+                    </div>
+                  )
               }
             })}
           </div>
