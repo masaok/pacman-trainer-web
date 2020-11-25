@@ -219,7 +219,7 @@ const carveFrom = (cx, cy, grid, level = 0) => {
   }
 }
 
-const addItems = (grid, item, max, avoid = ['X']) => {
+const addItems = (grid, item, max, avoid = ['X', 'G', 'P']) => {
   let count = 0
   while (count < max) {
     const randY = Math.floor(Math.random() * MAZE_HEIGHT)
@@ -289,7 +289,7 @@ const RecursiveBacktrackingMaze = props => {
     addItems(grid, 'G', MAX_GHOSTS)
     // console.log('RECURSIVE MAZE > FIRST LOAD EFFECT > GHOSTS:')
     // console.log(dump(grid))
-    addItems(grid, 'P', MAX_PACMEN, ['X', 'G'])
+    addItems(grid, 'P', MAX_PACMEN)
     setMaze(grid)
     // setMaze(carved)
   }, [seed])
