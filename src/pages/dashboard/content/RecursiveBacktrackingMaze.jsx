@@ -4,56 +4,9 @@ import clsx from 'clsx'
 
 import { makeStyles } from '@material-ui/core/styles'
 
-const useStyles = makeStyles(
-  theme => ({
-    root: {
-      display: 'flex',
-      flex: 1,
-      flexDirection: 'column',
-    },
-
-    mazeRow: {
-      display: 'flex',
-      flex: 1,
-    },
-
-    mazeBlock: {
-      display: 'flex',
-      flex: 1,
-      minHeight: 50,
-      minWidth: 50,
-      maxHeight: 50,
-      maxWidth: 50,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-
-    mazeSpace: {
-      backgroundColor: 'black',
-    },
-
-    mazeWall: {
-      backgroundColor: 'blue',
-    },
-
-    mazePacman: {
-      backgroundColor: 'yellow',
-    },
-
-    mazeGhost: {
-      backgroundColor: 'pink',
-    },
-
-    mazeError: {
-      backgroundColor: 'red',
-    },
-  }),
-  { name: 'RecursiveBacktrackingMaze' }
-)
-
 const MAX_GHOSTS = 2
 const MAX_PACMEN = 1
-const MAX_BRIDGE_REMOVALS = 2
+const MAX_BRIDGE_REMOVALS = 4
 
 const MAZE_HEIGHT = 9 // odd number
 const MAZE_WIDTH = 11 // odd number
@@ -62,7 +15,9 @@ const MAZE_WALL = 'X'
 const START_X = 1
 const START_Y = 1
 
-const REMOVAL_TOKEN = ' ' // dash for red highlight
+const showRemovals = true
+const REMOVAL_TOKEN = showRemovals ? '-' : ' ' // using middot instead for now
+const SPACE_TOKEN = '.'
 
 // Carve by 2 spaces to make room for walls
 const DX = {
@@ -105,6 +60,65 @@ const OPPOSITE = {
 
 const DIRECTIONS = ['E', 'W', 'N', 'S']
 
+const useStyles = makeStyles(
+  theme => ({
+    root: {
+      display: 'flex',
+      flex: 1,
+      flexDirection: 'column',
+    },
+
+    mazeRow: {
+      display: 'flex',
+      flex: 1,
+    },
+
+    mazeBlock: {
+      display: 'flex',
+      flex: 1,
+      minHeight: 50,
+      minWidth: 50,
+      maxHeight: 50,
+      maxWidth: 50,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+
+    mazeSpace: {
+      backgroundColor: 'black',
+      color: 'white',
+    },
+
+    mazeWall: {
+      backgroundColor: 'blue',
+    },
+
+    mazePacman: {
+      backgroundColor: 'yellow',
+      padding: theme.spacing(0.5),
+      backgroundClip: 'content-box',
+      boxShadow: 'inset 0 0 0 10px black',
+    },
+
+    mazeGhost: {
+      backgroundColor: 'pink',
+      padding: theme.spacing(0.5),
+      backgroundClip: 'content-box',
+      boxShadow: 'inset 0 0 0 10px black',
+    },
+
+    mazeRemoval: {
+      color: showRemovals ? 'red' : 'white',
+      backgroundColor: 'black',
+    },
+
+    mazeError: {
+      backgroundColor: 'red',
+    },
+  }),
+  { name: 'RecursiveBacktrackingMaze' }
+)
+
 // The de-facto unbiased shuffle algorithm is the Fisher-Yates (aka Knuth) Shuffle.
 // See https://github.com/coolaj86/knuth-shuffle
 // You can see a great visualization here (and the original post linked to this)
@@ -137,7 +151,7 @@ const dump = obj => {
     if (typeof item === 'object') {
       result += JSON.stringify(item) + '\n'
     } else {
-      result += item + ' '
+      result += item + SPACE_TOKEN
     }
 
     // }
@@ -203,7 +217,7 @@ const carveFrom = (cx, cy, grid, level = 0) => {
       console.log(spacing + '- WALL X: ' + wallX)
       const wallY = cy + DYW[direction]
       console.log(spacing + '- WALL Y: ' + wallY)
-      grid[wallY][wallX] = ' '
+      grid[wallY][wallX] = SPACE_TOKEN
 
       grid[cy][cx] = direction
       console.log(spacing + '- C DIR: ' + direction)
@@ -268,6 +282,26 @@ const removeBridges = (grid, max) => {
   return grid
 }
 
+const removeInnerWalls = grid => {
+  for (let row = 0; row < grid.length; row++) {
+    for (let col = 0; col < grid[row].length; col++) {
+      // If we ignore the edges...
+      if (row > 0 && row < MAZE_HEIGHT - 1 && col > 0 && col < MAZE_WIDTH - 1) {
+        console.log('IF 1 INNER > ROW: ' + row + ', COL: ' + col)
+        // ...and we consider only the inner edge...
+        if (row === 1 || row === MAZE_HEIGHT - 2 || col === 1 || col === MAZE_WIDTH - 2) {
+          console.log('IF 2 INNER > ROW: ' + row + ', COL: ' + col)
+          // ...and the block is a wall, make it a space
+          if (grid[row][col] === 'X') {
+            console.log('REMOVE INNER > ROW: ' + row + ', COL: ' + col)
+            grid[row][col] = REMOVAL_TOKEN
+          }
+        }
+      }
+    }
+  }
+}
+
 const RecursiveBacktrackingMaze = props => {
   const classes = useStyles(props)
 
@@ -283,6 +317,7 @@ const RecursiveBacktrackingMaze = props => {
     carveFrom(START_X, START_Y, grid)
     // console.log('RECURSIVE MAZE > FIRST LOAD EFFECT > CARVED:')
     // console.log(dump(grid))
+    removeInnerWalls(grid)
     removeBridges(grid, MAX_BRIDGE_REMOVALS)
     // console.log('RECURSIVE MAZE > FIRST LOAD EFFECT > REMOVAL:')
     // console.log(dump(grid))
@@ -313,14 +348,15 @@ const RecursiveBacktrackingMaze = props => {
           <div className={classes.mazeRow} key={rowIndex}>
             {maze[rowIndex].map((item, colIndex) => {
               switch (item) {
-                case ' ':
+                case SPACE_TOKEN:
                 case 'E':
                 case 'W':
                 case 'N':
                 case 'S':
                   return (
                     <div className={clsx(classes.mazeBlock, classes.mazeSpace)} key={colIndex}>
-                      {item}
+                      {/* {item} */}
+                      &middot;
                     </div>
                   )
                 case 'X':
@@ -339,6 +375,12 @@ const RecursiveBacktrackingMaze = props => {
                   return (
                     <div className={clsx(classes.mazeBlock, classes.mazeGhost)} key={colIndex}>
                       {item}
+                    </div>
+                  )
+                case REMOVAL_TOKEN:
+                  return (
+                    <div className={clsx(classes.mazeBlock, classes.mazeRemoval)} key={colIndex}>
+                      &middot;
                     </div>
                   )
                 default:
