@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
+
 import { Helmet } from 'react-helmet'
+import { useHistory } from 'react-router-dom'
 
 import { makeStyles } from '@material-ui/core/styles'
 
@@ -51,6 +53,8 @@ const useStyles = makeStyles(
 const Homepage = props => {
   const classes = useStyles(props)
 
+  const history = useHistory()
+
   const [seed, setSeed] = useState(Math.random())
 
   useEffect(() => {
@@ -61,7 +65,10 @@ const Homepage = props => {
     setSeed(Math.random())
   }
 
-  const handleCreateNewLobbyClick = () => {}
+  const handleCreateNewLobbyClick = () => {
+    console.log('HOMEPAGE > HANDLE CREATE NEW LOBBY CLICK')
+    history.push('/ASDF')
+  }
 
   return (
     <div className={classes.root}>

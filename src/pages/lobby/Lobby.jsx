@@ -3,8 +3,7 @@ import { Helmet } from 'react-helmet'
 
 import { makeStyles } from '@material-ui/core/styles'
 
-import Button from '@material-ui/core/Button'
-import TextField from '@material-ui/core/TextField'
+import Typography from '@material-ui/core/Typography'
 
 import RecursiveBacktrackingMaze from '../../mazes/RecursiveBacktrackingMaze'
 
@@ -70,7 +69,7 @@ const Lobby = props => {
       <Helmet>
         <title>Lobby {SITE_TITLE_POSTFIX}</title>
       </Helmet>
-      <div>{lobbyCode}</div>
+      <Typography variant="h3">Lobby: {lobbyCode}</Typography>
     </div>
   )
 }
