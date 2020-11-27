@@ -5,8 +5,8 @@ import { makeStyles } from '@material-ui/core/styles'
 
 import Button from '@material-ui/core/Button'
 
-import RandomMaze from '../../homepage/RandomMaze'
-import RecursiveBacktrackingMaze from '../../homepage/RecursiveBacktrackingMaze'
+// import RandomMaze from '../../../mazes/RandomMaze'
+import RecursiveBacktrackingMaze from '../../../mazes/RecursiveBacktrackingMaze'
 
 import { SITE_TITLE_POSTFIX } from '../../../constants'
 

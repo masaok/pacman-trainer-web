@@ -7,6 +7,7 @@ import { ThemeProvider, makeStyles } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
 
 import Homepage from './pages/homepage/Homepage'
+import Lobby from './pages/lobby/Lobby'
 
 import theme from './themes/default'
 
@@ -39,6 +40,7 @@ const App = props => {
         <CssBaseline />
         <Router>
           <Switch>
+            <Route exact path="/:lobbyCode" component={Lobby} />
             <Route exact path="/" component={Homepage} />
           </Switch>
         </Router>
