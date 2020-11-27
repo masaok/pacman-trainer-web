@@ -6,7 +6,7 @@ import { ThemeProvider, makeStyles } from '@material-ui/core/styles'
 
 import CssBaseline from '@material-ui/core/CssBaseline'
 
-import Dashboard from './pages/dashboard/Dashboard'
+import Homepage from './pages/homepage/Homepage'
 
 import theme from './themes/default'
 
@@ -39,7 +39,7 @@ const App = props => {
         <CssBaseline />
         <Router>
           <Switch>
-            <Route exact path="/" component={Dashboard} />
+            <Route exact path="/" component={Homepage} />
           </Switch>
         </Router>
       </ThemeProvider>

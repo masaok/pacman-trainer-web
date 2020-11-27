@@ -1,3 +1,4 @@
-const SITE_TITLE_POSTFIX = '| Pacman Training'
+const APP_TITLE = 'Pacman Trainer'
+const SITE_TITLE_POSTFIX = `| ${APP_TITLE}`
 
-export { SITE_TITLE_POSTFIX }
+export { APP_TITLE, SITE_TITLE_POSTFIX }

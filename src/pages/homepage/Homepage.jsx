@@ -4,11 +4,12 @@ import { Helmet } from 'react-helmet'
 import { makeStyles } from '@material-ui/core/styles'
 
 import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
 
-import RandomMaze from '../../homepage/RandomMaze'
-import RecursiveBacktrackingMaze from '../../homepage/RecursiveBacktrackingMaze'
+import RandomMaze from './RandomMaze'
+import RecursiveBacktrackingMaze from './RecursiveBacktrackingMaze'
 
-import { SITE_TITLE_POSTFIX } from '../../../constants'
+import { APP_TITLE } from '../../constants'
 
 const useStyles = makeStyles(
   theme => ({
@@ -25,6 +26,10 @@ const useStyles = makeStyles(
       marginTop: theme.spacing(3),
     },
 
+    button: {
+      marginTop: theme.spacing(3),
+    },
+
     // Controls
     controlArea: {
       display: 'flex',
@@ -32,11 +37,18 @@ const useStyles = makeStyles(
       marginTop: theme.spacing(3),
       justifyContent: 'center',
     },
+
+    createLobbyArea: {
+      display: 'flex',
+      flex: 1,
+      flexDirection: 'column',
+      marginTop: theme.spacing(3),
+    },
   }),
-  { name: 'TaskDisplay' }
+  { name: 'Homepage' }
 )
 
-const TaskDisplay = props => {
+const Homepage = props => {
   const classes = useStyles(props)
 
   const [seed, setSeed] = useState(Math.random())
@@ -49,10 +61,12 @@ const TaskDisplay = props => {
     setSeed(Math.random())
   }
 
+  const handleCreateNewLobbyClick = () => {}
+
   return (
     <div className={classes.root}>
       <Helmet>
-        <title>Task Display {SITE_TITLE_POSTFIX}</title>
+        <title>{APP_TITLE}</title>
       </Helmet>
       {/* <div className={classes.mazeContainer}>
         <RandomMaze seed={seed} />
@@ -65,8 +79,24 @@ const TaskDisplay = props => {
           GENERATE NEW MAZE
         </Button>
       </div>
+      <div className={classes.createLobbyArea}>
+        <TextField
+          label="Type your name here"
+          helperText="Name will be displayed to other users"
+          variant="outlined"
+          size="small"
+        />
+        <Button
+          className={classes.button}
+          variant="contained"
+          color="primary"
+          onClick={handleCreateNewLobbyClick}
+        >
+          Create New Lobby
+        </Button>
+      </div>
     </div>
   )
 }
 
-export default TaskDisplay
+export default Homepage
