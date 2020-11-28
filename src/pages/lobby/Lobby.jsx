@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, {
+  useEffect,
+  // useState
+} from 'react'
 import { Helmet } from 'react-helmet'
 
 import { makeStyles } from '@material-ui/core/styles'
 
 import Typography from '@material-ui/core/Typography'
 
-import RecursiveBacktrackingMaze from '../../mazes/RecursiveBacktrackingMaze'
+// import RecursiveBacktrackingMaze from '../../mazes/RecursiveBacktrackingMaze'
 
 import { SITE_TITLE_POSTFIX } from '../../constants'
 
@@ -49,20 +52,20 @@ const useStyles = makeStyles(
 const Lobby = props => {
   const classes = useStyles(props)
 
-  const [seed, setSeed] = useState(Math.random())
+  // const [seed, setSeed] = useState(Math.random())
 
   const lobbyCode = props.match.params['lobbyCode']
 
   useEffect(() => {
     console.log('TASK > FIRST LOAD EFFECT')
-    console.log('TASK > FIRST LOAD EFFECT > lobbyCode: ' + lobbyCode)
+    // console.log('TASK > FIRST LOAD EFFECT > lobbyCode: ' + lobbyCode)
   }, [])
 
-  const handleNewMazeClick = () => {
-    setSeed(Math.random())
-  }
+  // const handleNewMazeClick = () => {
+  //   setSeed(Math.random())
+  // }
 
-  const handleCreateNewLobbyClick = () => {}
+  // const handleCreateNewLobbyClick = () => {}
 
   return (
     <div className={classes.root}>
