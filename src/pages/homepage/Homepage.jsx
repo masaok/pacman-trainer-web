@@ -8,6 +8,8 @@ import { makeStyles } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 
+import { postLobby, postUser } from '../../api'
+
 // import RandomMaze from './RandomMaze'
 import RecursiveBacktrackingMaze from '../../mazes/RecursiveBacktrackingMaze'
 
@@ -56,18 +58,46 @@ const Homepage = props => {
   const history = useHistory()
 
   const [seed, setSeed] = useState(Math.random())
+  const [fieldValues, setFieldValues] = useState({
+    name: '',
+  })
 
   useEffect(() => {
     console.log('TASK > FIRST LOAD EFFECT')
   }, [])
 
+  // Click Handlers
   const handleNewMazeClick = () => {
     setSeed(Math.random())
   }
 
   const handleCreateNewLobbyClick = () => {
     console.log('HOMEPAGE > HANDLE CREATE NEW LOBBY CLICK')
-    history.push('/ASDF')
+    console.log('HOMEPAGE > HANDLE CREATE NEW LOBBY CLICK > fieldValues:')
+    console.log(fieldValues)
+
+    // Create a user
+    const payload = {
+      name: fieldValues?.name,
+    }
+
+    postUser(payload).then(user => {
+      console.log('POST USER > user:')
+      console.log(user)
+
+      postLobby({}).then(lobby => {
+        console.log('POST LOBBY > lobby:')
+        console.log(lobby)
+
+        history.push(`/${lobby?.code}`)
+      })
+    })
+  }
+
+  // Field Handlers
+  const handleFieldChange = event => {
+    const newValues = { ...fieldValues, [event.target.name]: event.target.value }
+    setFieldValues(newValues)
   }
 
   return (
@@ -92,6 +122,9 @@ const Homepage = props => {
           helperText="Name will be displayed to other users"
           variant="outlined"
           size="small"
+          name="name"
+          value={fieldValues.name}
+          onChange={handleFieldChange}
         />
         <Button
           className={classes.button}
