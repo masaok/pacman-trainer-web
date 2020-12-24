@@ -14,7 +14,7 @@ let theme = createMuiTheme({
   },
 
   typography: {
-    // Set global fonts here (install them in Helmet below):
+    // Set global fonts here (install them in Helmet in the main App):
     // https://material-ui.com/customization/typography/#font-family
 
     // Default font should be Roboto with Open Sans titles and accents

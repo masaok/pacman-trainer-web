@@ -12,8 +12,11 @@ import { postLobby, postUser } from '../../api'
 
 // import RandomMaze from './RandomMaze'
 import RecursiveBacktrackingMaze from '../../mazes/RecursiveBacktrackingMaze'
+import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
 
 import { APP_TITLE } from '../../constants'
+
+import { dumpGrid } from '../../common/helpers'
 
 const useStyles = makeStyles(
   theme => ({
@@ -28,6 +31,19 @@ const useStyles = makeStyles(
       display: 'flex',
       flex: 1,
       marginTop: theme.spacing(3),
+    },
+
+    mazeStringContainer: {
+      display: 'flex',
+      flex: 1,
+      marginTop: theme.spacing(3),
+    },
+
+    mazeStringField: {
+      // fontFamily: ['Roboto', 'sans-serif'].join(','),
+      // fontFamily: ['Open Sans', 'sans-serif'].join(','),
+      fontFamily: ['monospace'].join(','),
+      fontSize: 20,
     },
 
     button: {
@@ -61,6 +77,8 @@ const Homepage = props => {
   const [fieldValues, setFieldValues] = useState({
     name: '',
   })
+
+  const [mazeString, setMazeString] = useState('')
 
   useEffect(() => {
     console.log('TASK > FIRST LOAD EFFECT')
@@ -100,6 +118,23 @@ const Homepage = props => {
     setFieldValues(newValues)
   }
 
+  // Maze Generator Handlers
+  const handleNewMazeGenerated = maze => {
+    console.log('HANDLE NEW MAZE GENERATED')
+    console.log(maze)
+
+    const gridString = dumpGrid(maze, { stringify: false })
+
+    console.log('HANDLE NEW MAZE GENERATED > GRID STRING:')
+    console.log(gridString)
+    setMazeString(gridString)
+  }
+
+  // Text Maze Handlers
+  const handleTextMazeChange = event => {
+    console.log('HANDLE TEXT MAZE CHANGE')
+  }
+
   return (
     <div className={classes.root}>
       <Helmet>
@@ -109,7 +144,27 @@ const Homepage = props => {
         <RandomMaze seed={seed} />
       </div> */}
       <div className={classes.mazeContainer}>
-        <RecursiveBacktrackingMaze seed={seed} />
+        <RecursiveBacktrackingMaze seed={seed} handleNewMazeGenerated={handleNewMazeGenerated} />
+      </div>
+      <div className={classes.mazeStringContainer}>
+        <TextField
+          InputProps={{
+            classes: {
+              root: classes.mazeStringField, // overrride font size
+            },
+          }}
+          label="Edit Maze"
+          variant="outlined"
+          size="small"
+          name="name"
+          value={mazeString}
+          onChange={handleTextMazeChange}
+          multiline
+          rows={10}
+        />
+      </div>
+      <div className={classes.mazeContainer}>
+        <BlockMazeDisplay />
       </div>
       <div className={classes.controlArea}>
         <Button variant="contained" color="primary" onClick={handleNewMazeClick}>

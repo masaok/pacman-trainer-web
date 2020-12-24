@@ -4,13 +4,15 @@ import clsx from 'clsx'
 
 import { makeStyles } from '@material-ui/core/styles'
 
+import { dumpGrid } from '../common/helpers'
+
 const MAX_GHOSTS = 2
 const MAX_PACMEN = 1
+const MAX_PELLETS = 3
 const MAX_BRIDGE_REMOVALS = 4
 
 const MAZE_HEIGHT = 9 // odd number
 const MAZE_WIDTH = 11 // odd number
-const MAZE_WALL = 'X'
 
 const START_X = 1
 const START_Y = 1
@@ -18,6 +20,16 @@ const START_Y = 1
 const showRemovals = true
 const REMOVAL_TOKEN = showRemovals ? '-' : ' ' // using middot instead for now
 const SPACE_TOKEN = '.'
+
+const WALL = 'X'
+const PELLET = 'O'
+const PACMAN = 'P'
+const GHOST = 'G'
+
+const EAST = 'E'
+const WEST = 'W'
+const NORTH = 'N'
+const SOUTH = 'S'
 
 // Carve by 2 spaces to make room for walls
 const DX = {
@@ -52,13 +64,13 @@ const DYW = {
 }
 
 const OPPOSITE = {
-  E: 'W',
-  W: 'E',
-  N: 'S',
-  S: 'N',
+  E: WEST,
+  W: EAST,
+  N: SOUTH,
+  S: NORTH,
 }
 
-const DIRECTIONS = ['E', 'W', 'N', 'S']
+const DIRECTIONS = [EAST, WEST, NORTH, SOUTH]
 
 const useStyles = makeStyles(
   theme => ({
@@ -98,6 +110,13 @@ const useStyles = makeStyles(
       padding: theme.spacing(0.5),
       backgroundClip: 'content-box',
       boxShadow: 'inset 0 0 0 10px black',
+    },
+
+    mazePellet: {
+      backgroundColor: 'white',
+      padding: theme.spacing(0.5),
+      backgroundClip: 'content-box',
+      boxShadow: 'inset 0 0 0 15px black',
     },
 
     mazeGhost: {
@@ -159,20 +178,6 @@ const dump = obj => {
   return result
 }
 
-const dumpGrid = obj => {
-  let result = ''
-  const header = []
-  for (let i = 0; i < obj[0].length; i++) {
-    header.push(i.toString())
-  }
-  result += JSON.stringify(header) + '\n'
-  for (let i = 0; i < obj.length; i++) {
-    const item = obj[i]
-    result += JSON.stringify(item) + '\n'
-  }
-  return result
-}
-
 const randomInt = (min, max) => {
   min = Math.ceil(min)
   max = Math.floor(max)
@@ -210,7 +215,7 @@ const carveFrom = (cx, cy, grid, level = 0) => {
       nx <= MAZE_WIDTH - 1 && // X in bounds
       ny >= 0 &&
       ny <= MAZE_HEIGHT - 1 && // Y in bounds
-      grid[ny][nx] === 'X' // new location is a wall
+      grid[ny][nx] === WALL // new location is a wall
     ) {
       // Carve the wall
       const wallX = cx + DXW[direction]
@@ -233,7 +238,7 @@ const carveFrom = (cx, cy, grid, level = 0) => {
   }
 }
 
-const addItems = (grid, item, max, avoid = ['X', 'G', 'P']) => {
+const addItems = (grid, item, max, avoid = [WALL, GHOST, PACMAN, PELLET]) => {
   let count = 0
   while (count < max) {
     const randY = Math.floor(Math.random() * MAZE_HEIGHT)
@@ -267,10 +272,10 @@ const removeBridges = (grid, max) => {
     const Xminus = grid[randY][randX - 1]
     console.log('X PLUS MINUS: ' + Xplus + ', ' + Xminus)
 
-    if (grid[randY][randX] === 'X')
+    if (grid[randY][randX] === WALL)
       if (
-        (Yplus === 'X' && Yminus === 'X' && Xplus !== 'X' && Xminus !== 'X') ||
-        (Xplus === 'X' && Xminus === 'X' && Yplus !== 'X' && Yminus !== 'X')
+        (Yplus === WALL && Yminus === WALL && Xplus !== WALL && Xminus !== WALL) ||
+        (Xplus === WALL && Xminus === WALL && Yplus !== WALL && Yminus !== WALL)
       ) {
         console.log(dumpGrid(grid))
         console.log('REMOVING AT: ' + randX + ', ' + randY)
@@ -292,7 +297,7 @@ const removeInnerWalls = grid => {
         if (row === 1 || row === MAZE_HEIGHT - 2 || col === 1 || col === MAZE_WIDTH - 2) {
           console.log('IF 2 INNER > ROW: ' + row + ', COL: ' + col)
           // ...and the block is a wall, make it a space
-          if (grid[row][col] === 'X') {
+          if (grid[row][col] === WALL) {
             console.log('REMOVE INNER > ROW: ' + row + ', COL: ' + col)
             grid[row][col] = REMOVAL_TOKEN
           }
@@ -305,7 +310,7 @@ const removeInnerWalls = grid => {
 const RecursiveBacktrackingMaze = props => {
   const classes = useStyles(props)
 
-  const { seed } = props
+  const { seed, handleNewMazeGenerated } = props
 
   const [maze, setMaze] = useState([])
 
@@ -321,20 +326,25 @@ const RecursiveBacktrackingMaze = props => {
     removeBridges(grid, MAX_BRIDGE_REMOVALS)
     // console.log('RECURSIVE MAZE > FIRST LOAD EFFECT > REMOVAL:')
     // console.log(dump(grid))
-    addItems(grid, 'G', MAX_GHOSTS)
+    addItems(grid, GHOST, MAX_GHOSTS)
     // console.log('RECURSIVE MAZE > FIRST LOAD EFFECT > GHOSTS:')
     // console.log(dump(grid))
-    addItems(grid, 'P', MAX_PACMEN)
+    addItems(grid, PACMAN, MAX_PACMEN)
+    addItems(grid, PELLET, MAX_PELLETS)
     setMaze(grid)
     // setMaze(carved)
   }, [seed])
+
+  useEffect(() => {
+    handleNewMazeGenerated(maze)
+  }, [maze, handleNewMazeGenerated])
 
   const generateInitialMaze = () => {
     const newMaze = []
     for (let row = 0; row < MAZE_HEIGHT; row++) {
       const newRow = []
       for (let col = 0; col < MAZE_WIDTH; col++) {
-        newRow.push(MAZE_WALL)
+        newRow.push(WALL)
       }
       newMaze.push(newRow)
     }
@@ -349,31 +359,37 @@ const RecursiveBacktrackingMaze = props => {
             {maze[rowIndex].map((item, colIndex) => {
               switch (item) {
                 case SPACE_TOKEN:
-                case 'E':
-                case 'W':
-                case 'N':
-                case 'S':
+                case EAST:
+                case WEST:
+                case NORTH:
+                case SOUTH:
                   return (
                     <div className={clsx(classes.mazeBlock, classes.mazeSpace)} key={colIndex}>
                       {/* {item} */}
                       &middot;
                     </div>
                   )
-                case 'X':
+                case GHOST:
                   return (
-                    <div className={clsx(classes.mazeBlock, classes.mazeWall)} key={colIndex}>
+                    <div className={clsx(classes.mazeBlock, classes.mazeGhost)} key={colIndex}>
                       {item}
                     </div>
                   )
-                case 'P':
+                case PELLET:
+                  return (
+                    <div className={clsx(classes.mazeBlock, classes.mazePellet)} key={colIndex}>
+                      {item}
+                    </div>
+                  )
+                case PACMAN:
                   return (
                     <div className={clsx(classes.mazeBlock, classes.mazePacman)} key={colIndex}>
                       {item}
                     </div>
                   )
-                case 'G':
+                case WALL:
                   return (
-                    <div className={clsx(classes.mazeBlock, classes.mazeGhost)} key={colIndex}>
+                    <div className={clsx(classes.mazeBlock, classes.mazeWall)} key={colIndex}>
                       {item}
                     </div>
                   )
