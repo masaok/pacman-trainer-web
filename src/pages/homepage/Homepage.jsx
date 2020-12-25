@@ -10,7 +10,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 
-import { postLobby, postUser } from '../../api'
+import { postLobby, postLobbyMaze, postMaze, postUser } from '../../api'
 
 // import RandomMaze from './RandomMaze'
 import { generateMazeGrid } from '../../mazes/RecursiveBacktrackingMaze'
@@ -97,9 +97,9 @@ const Homepage = props => {
   const history = useHistory()
 
   const [fieldValues, setFieldValues] = useState({
-    name: '',
-    prompt: '',
-    numSamples: '',
+    name: 'Mock Name',
+    prompt: 'Mock Prompt',
+    numSamples: '10',
   })
 
   const [mazeString, setMazeString] = useState('')
@@ -124,16 +124,33 @@ const Homepage = props => {
     // Create a user
     const payload = {
       name: fieldValues?.name,
+      role: 'instructor',
     }
 
     const user = await postUser(payload)
     console.log('POST USER > user:')
     console.log(user)
 
-    const lobby = await postLobby({})
+    const maze = await postMaze({
+      string: mazeString,
+    })
+    console.log('POST MAZE > maze:')
+    console.log(maze)
+
+    const lobby = await postLobby({
+      prompt: fieldValues.prompt,
+      numSamples: fieldValues.numSamples,
+    })
     console.log('POST LOBBY > lobby:')
     console.log(lobby)
     history.push(`/${lobby?.code}`)
+
+    const lobbyMaze = await postLobbyMaze({
+      lobbyId: lobby.lobby_id,
+      mazeId: maze.maze_id,
+    })
+    console.log('POST LOBBY MAZE > lobbyMaze:')
+    console.log(lobbyMaze)
   }
 
   // Field Handlers
