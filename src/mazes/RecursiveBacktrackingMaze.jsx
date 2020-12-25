@@ -172,10 +172,10 @@ const randomInt = (min, max) => {
 }
 
 const carveFrom = (cx, cy, grid, level = 0) => {
-  let spacing = ''
-  for (let i = 0; i < level; i++) {
-    spacing += '  '
-  }
+  // let spacing = ''
+  // for (let i = 0; i < level; i++) {
+  //   spacing += '  '
+  // }
   // console.log(spacing + 'LEVEL: ' + level)
   // console.log(spacing + 'CARVE FROM CX: ' + cx)
   // console.log(spacing + 'CARVE FROM CY: ' + cy)

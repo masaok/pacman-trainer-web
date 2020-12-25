@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
+import clsx from 'clsx'
+
 import { Helmet } from 'react-helmet'
 import { useHistory } from 'react-router-dom'
 
@@ -65,10 +67,24 @@ const useStyles = makeStyles(
       justifyContent: 'center',
     },
 
+    // Lobby Fields
+    formFields: {
+      display: 'flex',
+    },
+
+    field: {
+      margin: theme.spacing(1),
+    },
+
+    numSamplesField: {
+      maxWidth: 140,
+    },
+
     createLobbyArea: {
       display: 'flex',
       flex: 1,
       flexDirection: 'column',
+      alignItems: 'center',
       marginTop: theme.spacing(3),
     },
   }),
@@ -82,6 +98,8 @@ const Homepage = props => {
 
   const [fieldValues, setFieldValues] = useState({
     name: '',
+    prompt: '',
+    numSamples: '',
   })
 
   const [mazeString, setMazeString] = useState('')
@@ -167,23 +185,52 @@ const Homepage = props => {
         </Button>
       </div>
       <div className={classes.createLobbyArea}>
-        <TextField
-          label="Type your name here"
-          helperText="Name will be displayed to other users"
-          variant="outlined"
-          size="small"
-          name="name"
-          value={fieldValues.name}
-          onChange={handleFieldChange}
-        />
-        <Button
-          className={classes.button}
-          variant="contained"
-          color="primary"
-          onClick={handleCreateNewLobbyClick}
-        >
-          Create New Lobby
-        </Button>
+        <div className={classes.formFields}>
+          <TextField
+            className={clsx(classes.field, classes.nameField)}
+            label="Type your name here"
+            helperText="Name will be displayed to other users"
+            variant="outlined"
+            size="small"
+            name="name"
+            value={fieldValues.name}
+            onChange={handleFieldChange}
+          />
+          <TextField
+            className={clsx(classes.field, classes.promptField)}
+            label="Worker Prompt"
+            helperText="Instructions for your workers to follow"
+            variant="outlined"
+            size="small"
+            name="prompt"
+            placeholder="Choose the move that helps Pacman survive"
+            value={fieldValues.prompt}
+            onChange={handleFieldChange}
+            multiline
+            rows={2}
+          />
+          <TextField
+            className={clsx(classes.field, classes.numSamplesField)}
+            label="# of Samples"
+            helperText="How many samples do you want each worker to handle?"
+            variant="outlined"
+            size="small"
+            name="numSamples"
+            placeholder="10"
+            value={fieldValues.numSamples}
+            onChange={handleFieldChange}
+          />
+        </div>
+        <div className={classes.createLobbyButtonContainer}>
+          <Button
+            className={classes.button}
+            variant="contained"
+            color="primary"
+            onClick={handleCreateNewLobbyClick}
+          >
+            Create New Lobby
+          </Button>
+        </div>
       </div>
     </div>
   )

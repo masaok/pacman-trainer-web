@@ -1,5 +1,7 @@
 import React from 'react'
-import { Helmet } from 'react-helmet'
+// import { Helmet } from 'react-helmet'
+import { Helmet, HelmetProvider } from 'react-helmet-async'
+
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom'
 
 import { ThemeProvider, makeStyles } from '@material-ui/core/styles'
@@ -28,24 +30,26 @@ const App = props => {
   const classes = useStyles(props)
 
   return (
-    <div className={classes.app}>
-      <Helmet>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
-          rel="stylesheet"
-        />
-      </Helmet>
-      <ThemeProvider theme={theme}>
-        {/* Global CSS reset: https://material-ui.com/components/css-baseline/ */}
-        <CssBaseline />
-        <Router>
-          <Switch>
-            <Route exact path="/:lobbyCode" component={Lobby} />
-            <Route exact path="/" component={Homepage} />
-          </Switch>
-        </Router>
-      </ThemeProvider>
-    </div>
+    <HelmetProvider>
+      <div className={classes.app}>
+        <Helmet>
+          <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+            rel="stylesheet"
+          />
+        </Helmet>
+        <ThemeProvider theme={theme}>
+          {/* Global CSS reset: https://material-ui.com/components/css-baseline/ */}
+          <CssBaseline />
+          <Router>
+            <Switch>
+              <Route exact path="/:lobbyCode" component={Lobby} />
+              <Route exact path="/" component={Homepage} />
+            </Switch>
+          </Router>
+        </ThemeProvider>
+      </div>
+    </HelmetProvider>
   )
 }
 
