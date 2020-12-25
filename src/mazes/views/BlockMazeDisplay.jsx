@@ -84,22 +84,22 @@ const useStyles = makeStyles(
   { name: 'BlockMazeDisplay' }
 )
 
-const mazeString = `
-XXXXXXXXXXX
-X.........X
-X.XGX.X.X.X
-X....OX.O.X
-X.X.X.X.X.X
-X....OX.X.X
-X.XXX.X.X.X
-X.P.....G.X
-XXXXXXXXXXX
-`
+// const mazeString = `
+// XXXXXXXXXXX
+// X.........X
+// X.XGX.X.X.X
+// X....OX.O.X
+// X.X.X.X.X.X
+// X....OX.X.X
+// X.XXX.X.X.X
+// X.P.....G.X
+// XXXXXXXXXXX
+// `
 
 const BlockMazeDisplay = props => {
   const classes = useStyles(props)
 
-  // const {} = props
+  const { mazeString } = props
 
   const [maze, setMaze] = useState([])
 
@@ -108,12 +108,10 @@ const BlockMazeDisplay = props => {
     const lines = mazeString.split('\n')
     for (let i = 0; i < lines.length; i++) {
       const item = lines[i]
-      console.log('BLOCK > ITEM:')
-      console.log(item)
       grid.push(item.split(''))
     }
     setMaze(grid)
-  }, [])
+  }, [mazeString])
 
   return (
     <div className={classes.root}>

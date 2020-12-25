@@ -4,7 +4,9 @@ import clsx from 'clsx'
 
 import { makeStyles } from '@material-ui/core/styles'
 
-import { dumpGrid } from '../common/helpers'
+// import { dumpGrid } from '../common/helpers'
+
+import { generateInitialMaze } from './common'
 
 const MAX_GHOSTS = 2
 const MAX_PACMEN = 1
@@ -161,23 +163,6 @@ const shuffle = array => {
   return [...array] // return a new copy
 }
 
-const dump = obj => {
-  let result = ''
-  for (let i = 0; i < obj.length; i++) {
-    // for (let col = 0; col < grid[row].length; col++) {
-    const item = obj[i]
-
-    if (typeof item === 'object') {
-      result += JSON.stringify(item) + '\n'
-    } else {
-      result += item + SPACE_TOKEN
-    }
-
-    // }
-  }
-  return result
-}
-
 const randomInt = (min, max) => {
   min = Math.ceil(min)
   max = Math.floor(max)
@@ -191,24 +176,24 @@ const carveFrom = (cx, cy, grid, level = 0) => {
   for (let i = 0; i < level; i++) {
     spacing += '  '
   }
-  console.log(spacing + 'LEVEL: ' + level)
-  console.log(spacing + 'CARVE FROM CX: ' + cx)
-  console.log(spacing + 'CARVE FROM CY: ' + cy)
-  console.log(spacing + 'GRID: ')
-  console.log(dump(grid))
+  // console.log(spacing + 'LEVEL: ' + level)
+  // console.log(spacing + 'CARVE FROM CX: ' + cx)
+  // console.log(spacing + 'CARVE FROM CY: ' + cy)
+  // console.log(spacing + 'GRID: ')
+  // console.log(dump(grid))
 
   const directions = shuffle(DIRECTIONS)
 
   // for (const direction in directions) {
   for (let i = 0; i < directions.length; i++) {
-    console.log(spacing + 'DIRECTIONS LEFT: ')
-    console.log(spacing + dump(directions))
+    // console.log(spacing + 'DIRECTIONS LEFT: ')
+    // console.log(spacing + dump(directions))
     const direction = directions[i]
-    console.log(spacing + '- LOOP DIRECTION: ' + direction)
+    // console.log(spacing + '- LOOP DIRECTION: ' + direction)
     const nx = cx + DX[direction]
-    console.log(spacing + '- NX: ' + nx)
+    // console.log(spacing + '- NX: ' + nx)
     const ny = cy + DY[direction]
-    console.log(spacing + '- NY: ' + ny)
+    // console.log(spacing + '- NY: ' + ny)
 
     if (
       nx >= 0 &&
@@ -219,15 +204,15 @@ const carveFrom = (cx, cy, grid, level = 0) => {
     ) {
       // Carve the wall
       const wallX = cx + DXW[direction]
-      console.log(spacing + '- WALL X: ' + wallX)
+      // console.log(spacing + '- WALL X: ' + wallX)
       const wallY = cy + DYW[direction]
-      console.log(spacing + '- WALL Y: ' + wallY)
+      // console.log(spacing + '- WALL Y: ' + wallY)
       grid[wallY][wallX] = SPACE_TOKEN
 
       grid[cy][cx] = direction
-      console.log(spacing + '- C DIR: ' + direction)
+      // console.log(spacing + '- C DIR: ' + direction)
       grid[ny][nx] = OPPOSITE[direction]
-      console.log(spacing + '- N DIR: ' + OPPOSITE[direction])
+      // console.log(spacing + '- N DIR: ' + OPPOSITE[direction])
       carveFrom(nx, ny, grid, level + 1)
     }
   }
@@ -244,10 +229,10 @@ const addItems = (grid, item, max, avoid = [WALL, GHOST, PACMAN, PELLET]) => {
     const randY = Math.floor(Math.random() * MAZE_HEIGHT)
     const randX = Math.floor(Math.random() * MAZE_WIDTH)
 
-    console.log('TRYING: ' + randX + ', ' + randY)
+    // console.log('TRYING: ' + randX + ', ' + randY)
 
     if (!avoid.includes(grid[randY][randX])) {
-      console.log('ADDED: ' + item)
+      // console.log('ADDED: ' + item)
       grid[randY][randX] = item
       count++
     }
@@ -261,26 +246,26 @@ const removeBridges = (grid, max) => {
     const randY = randomInt(1, MAZE_HEIGHT - 2)
     const randX = randomInt(1, MAZE_WIDTH - 2)
 
-    console.log('TRYING: ' + randX + ', ' + randY)
-    console.log('  ITEM: ' + grid[randY][randX])
+    // console.log('TRYING: ' + randX + ', ' + randY)
+    // console.log('  ITEM: ' + grid[randY][randX])
 
     const Yplus = grid[parseInt(randY + 1)][parseInt(randX)]
     const Yminus = grid[parseInt(randY - 1)][parseInt(randX)]
-    console.log('Y PLUS MINUS: ' + Yplus + ', ' + Yminus)
+    // console.log('Y PLUS MINUS: ' + Yplus + ', ' + Yminus)
 
     const Xplus = grid[randY][randX + 1]
     const Xminus = grid[randY][randX - 1]
-    console.log('X PLUS MINUS: ' + Xplus + ', ' + Xminus)
+    // console.log('X PLUS MINUS: ' + Xplus + ', ' + Xminus)
 
     if (grid[randY][randX] === WALL)
       if (
         (Yplus === WALL && Yminus === WALL && Xplus !== WALL && Xminus !== WALL) ||
         (Xplus === WALL && Xminus === WALL && Yplus !== WALL && Yminus !== WALL)
       ) {
-        console.log(dumpGrid(grid))
-        console.log('REMOVING AT: ' + randX + ', ' + randY)
+        // console.log(dumpGrid(grid))
+        // console.log('REMOVING AT: ' + randX + ', ' + randY)
         grid[parseInt(randY)][parseInt(randX)] = REMOVAL_TOKEN
-        console.log(dumpGrid(grid))
+        // console.log(dumpGrid(grid))
         count++
       }
   }
@@ -292,19 +277,32 @@ const removeInnerWalls = grid => {
     for (let col = 0; col < grid[row].length; col++) {
       // If we ignore the edges...
       if (row > 0 && row < MAZE_HEIGHT - 1 && col > 0 && col < MAZE_WIDTH - 1) {
-        console.log('IF 1 INNER > ROW: ' + row + ', COL: ' + col)
+        // console.log('IF 1 INNER > ROW: ' + row + ', COL: ' + col)
         // ...and we consider only the inner edge...
         if (row === 1 || row === MAZE_HEIGHT - 2 || col === 1 || col === MAZE_WIDTH - 2) {
-          console.log('IF 2 INNER > ROW: ' + row + ', COL: ' + col)
+          // console.log('IF 2 INNER > ROW: ' + row + ', COL: ' + col)
           // ...and the block is a wall, make it a space
           if (grid[row][col] === WALL) {
-            console.log('REMOVE INNER > ROW: ' + row + ', COL: ' + col)
+            // console.log('REMOVE INNER > ROW: ' + row + ', COL: ' + col)
             grid[row][col] = REMOVAL_TOKEN
           }
         }
       }
     }
   }
+}
+
+const generateMazeGrid = () => {
+  const grid = generateInitialMaze(MAZE_WIDTH, MAZE_HEIGHT)
+  // console.log('RECURSIVE MAZE > FIRST LOAD EFFECT > INITIAL GRID:')
+  // console.log(dump(grid))
+  carveFrom(START_X, START_Y, grid)
+  removeInnerWalls(grid)
+  removeBridges(grid, MAX_BRIDGE_REMOVALS)
+  addItems(grid, GHOST, MAX_GHOSTS)
+  addItems(grid, PACMAN, MAX_PACMEN)
+  addItems(grid, PELLET, MAX_PELLETS)
+  return grid
 }
 
 const RecursiveBacktrackingMaze = props => {
@@ -316,21 +314,7 @@ const RecursiveBacktrackingMaze = props => {
 
   useEffect(() => {
     console.log('RECURSIVE MAZE > FIRST LOAD EFFECT')
-    const grid = generateInitialMaze()
-    console.log('RECURSIVE MAZE > FIRST LOAD EFFECT > INITIAL GRID:')
-    console.log(dump(grid))
-    carveFrom(START_X, START_Y, grid)
-    // console.log('RECURSIVE MAZE > FIRST LOAD EFFECT > CARVED:')
-    // console.log(dump(grid))
-    removeInnerWalls(grid)
-    removeBridges(grid, MAX_BRIDGE_REMOVALS)
-    // console.log('RECURSIVE MAZE > FIRST LOAD EFFECT > REMOVAL:')
-    // console.log(dump(grid))
-    addItems(grid, GHOST, MAX_GHOSTS)
-    // console.log('RECURSIVE MAZE > FIRST LOAD EFFECT > GHOSTS:')
-    // console.log(dump(grid))
-    addItems(grid, PACMAN, MAX_PACMEN)
-    addItems(grid, PELLET, MAX_PELLETS)
+    const grid = generateMazeGrid()
     setMaze(grid)
     // setMaze(carved)
   }, [seed])
@@ -338,18 +322,6 @@ const RecursiveBacktrackingMaze = props => {
   useEffect(() => {
     handleNewMazeGenerated(maze)
   }, [maze, handleNewMazeGenerated])
-
-  const generateInitialMaze = () => {
-    const newMaze = []
-    for (let row = 0; row < MAZE_HEIGHT; row++) {
-      const newRow = []
-      for (let col = 0; col < MAZE_WIDTH; col++) {
-        newRow.push(WALL)
-      }
-      newMaze.push(newRow)
-    }
-    return newMaze
-  }
 
   return (
     <div className={classes.root}>
@@ -413,5 +385,7 @@ const RecursiveBacktrackingMaze = props => {
     </div>
   )
 }
+
+export { generateMazeGrid }
 
 export default RecursiveBacktrackingMaze
