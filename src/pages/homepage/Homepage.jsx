@@ -116,7 +116,7 @@ const Homepage = props => {
     // setSeed(Math.random())
   }
 
-  const handleCreateNewLobbyClick = () => {
+  const handleCreateNewLobbyClick = async () => {
     console.log('HOMEPAGE > HANDLE CREATE NEW LOBBY CLICK')
     console.log('HOMEPAGE > HANDLE CREATE NEW LOBBY CLICK > fieldValues:')
     console.log(fieldValues)
@@ -126,17 +126,14 @@ const Homepage = props => {
       name: fieldValues?.name,
     }
 
-    postUser(payload).then(user => {
-      console.log('POST USER > user:')
-      console.log(user)
+    const user = await postUser(payload)
+    console.log('POST USER > user:')
+    console.log(user)
 
-      postLobby({}).then(lobby => {
-        console.log('POST LOBBY > lobby:')
-        console.log(lobby)
-
-        history.push(`/${lobby?.code}`)
-      })
-    })
+    const lobby = await postLobby({})
+    console.log('POST LOBBY > lobby:')
+    console.log(lobby)
+    history.push(`/${lobby?.code}`)
   }
 
   // Field Handlers
