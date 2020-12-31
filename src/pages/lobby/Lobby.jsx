@@ -1,7 +1,4 @@
-import React, {
-  useEffect,
-  // useState
-} from 'react'
+import React, { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet'
 
 import { makeStyles } from '@material-ui/core/styles'
@@ -9,6 +6,9 @@ import { makeStyles } from '@material-ui/core/styles'
 import Typography from '@material-ui/core/Typography'
 
 // import RecursiveBacktrackingMaze from '../../mazes/RecursiveBacktrackingMaze'
+import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
+
+import { getLobbyMaze } from '../../api'
 
 import { SITE_TITLE_POSTFIX } from '../../constants'
 
@@ -56,10 +56,25 @@ const Lobby = props => {
 
   const lobbyCode = props.match.params['lobbyCode']
 
+  const [mazeString, setMazeString] = useState('')
+
   useEffect(() => {
-    console.log('TASK > FIRST LOAD EFFECT')
+    console.log('TASK > LOBBY CODE EFFECT')
+
     // console.log('TASK > FIRST LOAD EFFECT > lobbyCode: ' + lobbyCode)
-  }, [])
+
+    const retrieveLobbyMaze = async () => {
+      try {
+        if (lobbyCode) {
+          const maze = await getLobbyMaze(lobbyCode)
+          console.log('TASK > LOBBY CODE EFFECT > RETRIEVE > maze:')
+          console.log(maze)
+          setMazeString(maze.maze_string)
+        }
+      } catch (err) {} // do nothing
+    }
+    retrieveLobbyMaze()
+  }, [lobbyCode])
 
   // const handleNewMazeClick = () => {
   //   setSeed(Math.random())
@@ -73,6 +88,9 @@ const Lobby = props => {
         <title>Lobby {SITE_TITLE_POSTFIX}</title>
       </Helmet>
       <Typography variant="h3">Lobby: {lobbyCode}</Typography>
+      <div className={classes.mazeContainer}>
+        <BlockMazeDisplay mazeString={mazeString} />
+      </div>
     </div>
   )
 }
