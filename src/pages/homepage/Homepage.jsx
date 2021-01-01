@@ -2,13 +2,16 @@ import React, { useEffect, useState } from 'react'
 
 import clsx from 'clsx'
 
-import { Helmet } from 'react-helmet'
+import { Helmet } from 'react-helmet-async'
+
 import { useHistory } from 'react-router-dom'
 
 import { makeStyles } from '@material-ui/core/styles'
 
 import Button from '@material-ui/core/Button'
+import Paper from '@material-ui/core/Paper'
 import TextField from '@material-ui/core/TextField'
+import Typography from '@material-ui/core/Typography'
 
 import { postLobby, postLobbyMaze, postMaze, postUser } from '../../api'
 
@@ -27,9 +30,18 @@ const useStyles = makeStyles(
       flex: 1,
       flexDirection: 'column',
       alignItems: 'center',
+      // backgroundColor: theme.palette.grey[200],
+      backgroundColor: theme.palette.primary.light,
     },
 
     // Maze Display styles
+    mazeGenerationPanel: {
+      display: 'flex',
+      flex: 1,
+      flexDirection: 'column',
+      padding: theme.spacing(3),
+      margin: theme.spacing(1),
+    },
 
     mazeArea: {
       display: 'flex',
@@ -40,7 +52,6 @@ const useStyles = makeStyles(
     mazeContainer: {
       display: 'flex',
       flex: 1,
-      margin: theme.spacing(3),
     },
 
     mazeEditor: {
@@ -61,10 +72,18 @@ const useStyles = makeStyles(
     },
 
     // Controls
-    controlArea: {
+    mazeControlArea: {
       display: 'flex',
       flex: 1,
       justifyContent: 'center',
+      paddingTop: theme.spacing(3),
+    },
+
+    // Name Panel
+    namePanel: {
+      display: 'flex',
+      flex: 1,
+      padding: theme.spacing(3),
     },
 
     // Lobby Fields
@@ -80,12 +99,27 @@ const useStyles = makeStyles(
       maxWidth: 140,
     },
 
-    createLobbyArea: {
+    // Join Lobby Panel
+    joinLobbyPanel: {
       display: 'flex',
       flex: 1,
       flexDirection: 'column',
       alignItems: 'center',
       marginTop: theme.spacing(3),
+      padding: theme.spacing(3),
+    },
+
+    joinLobbyButtonContainer: {
+      marginTop: theme.spacing(1),
+    },
+
+    createLobbyPanel: {
+      display: 'flex',
+      flex: 1,
+      flexDirection: 'column',
+      alignItems: 'center',
+      marginTop: theme.spacing(3),
+      padding: theme.spacing(3),
     },
   }),
   { name: 'Homepage' }
@@ -103,6 +137,7 @@ const Homepage = props => {
   })
 
   const [mazeString, setMazeString] = useState('')
+  const [lobbyCode, setLobbyCode] = useState('')
 
   useEffect(() => {
     handleGenerateNewMazeClick()
@@ -121,7 +156,7 @@ const Homepage = props => {
     console.log('HOMEPAGE > HANDLE CREATE NEW LOBBY CLICK > fieldValues:')
     console.log(fieldValues)
 
-    // Create a user
+    // Create the instructor user
     const payload = {
       name: fieldValues?.name,
       role: 'instructor',
@@ -130,17 +165,21 @@ const Homepage = props => {
     const user = await postUser(payload)
     console.log('POST USER > user:')
     console.log(user)
+    if (!user) throw new Error('user creation failed')
 
     const maze = await postMaze({
       string: mazeString,
     })
     console.log('POST MAZE > maze:')
     console.log(maze)
+    if (!maze) throw new Error('maze creation failed')
 
     const lobby = await postLobby({
       prompt: fieldValues.prompt,
       numSamples: fieldValues.numSamples,
+      createdBy: user.user_id,
     })
+    if (!lobby) throw new Error('lobby creation failed')
     console.log('POST LOBBY > lobby:')
     console.log(lobby)
     history.push(`/${lobby?.code}`)
@@ -153,10 +192,27 @@ const Homepage = props => {
     console.log(lobbyMaze)
   }
 
+  const handleJoinLobbyClick = async () => {
+    // Create the instructor user
+    const payload = {
+      name: fieldValues?.name,
+      role: 'student',
+    }
+
+    const user = await postUser(payload)
+    console.log('POST USER > user:')
+    console.log(user)
+    if (!user) throw new Error('user creation failed')
+  }
+
   // Field Handlers
   const handleFieldChange = event => {
     const newValues = { ...fieldValues, [event.target.name]: event.target.value }
     setFieldValues(newValues)
+  }
+
+  const handleLobbyCodeChange = event => {
+    setLobbyCode(event.target.value)
   }
 
   // Text Maze Handlers
@@ -166,50 +222,86 @@ const Homepage = props => {
     setMazeString(event.target.value)
   }
 
+  // console.log('MAZE STRING: ' + mazeString)
+  // console.log('FIELD VALUES: ')
+  // console.log(fieldValues)
+
   return (
     <div className={classes.root}>
       <Helmet>
         <title>{APP_TITLE}</title>
       </Helmet>
-      <div className={classes.mazeArea}>
-        <div className={classes.mazeContainer}>
-          <BlockMazeDisplay mazeString={mazeString} />
+      <Typography variant="h2">{APP_TITLE}</Typography>
+      <Paper className={classes.mazeGenerationPanel}>
+        <div className={classes.mazeArea}>
+          <div className={classes.mazeContainer}>
+            <BlockMazeDisplay mazeString={mazeString} />
+          </div>
+          <div className={classes.mazeEditor}>
+            <TextField
+              InputProps={{
+                classes: {
+                  root: classes.mazeStringField, // overrride font size
+                },
+              }}
+              label="Maze Editor"
+              variant="outlined"
+              size="small"
+              name="maze"
+              value={mazeString}
+              onChange={handleTextMazeChange}
+              multiline
+              rows={10}
+            />
+          </div>
         </div>
-        <div className={classes.mazeEditor}>
-          <TextField
-            InputProps={{
-              classes: {
-                root: classes.mazeStringField, // overrride font size
-              },
-            }}
-            label="Maze Editor"
-            variant="outlined"
-            size="small"
-            name="maze"
-            value={mazeString}
-            onChange={handleTextMazeChange}
-            multiline
-            rows={10}
-          />
+        <div className={classes.mazeControlArea}>
+          <Button variant="contained" color="primary" onClick={handleGenerateNewMazeClick}>
+            GENERATE NEW MAZE
+          </Button>
         </div>
-      </div>
-      <div className={classes.controlArea}>
-        <Button variant="contained" color="primary" onClick={handleGenerateNewMazeClick}>
-          GENERATE NEW MAZE
-        </Button>
-      </div>
-      <div className={classes.createLobbyArea}>
+      </Paper>
+
+      {/* Name Panel */}
+      <Paper className={classes.namePanel}>
+        <TextField
+          className={clsx(classes.field, classes.nameField)}
+          label="Type your name here"
+          helperText="Name will be displayed to other users"
+          variant="outlined"
+          size="small"
+          name="name"
+          value={fieldValues.name}
+          onChange={handleFieldChange}
+        />
+      </Paper>
+
+      {/* Join Lobby Panel */}
+      <Paper className={classes.joinLobbyPanel}>
+        <TextField
+          className={clsx(classes.field, classes.nameField)}
+          label="Enter lobby code here"
+          variant="outlined"
+          size="small"
+          name="lobbyCode"
+          value={lobbyCode}
+          onChange={handleLobbyCodeChange}
+        />
+        <div className={classes.joinLobbyButtonContainer}>
+          <Button
+            className={classes.joinLobbyButton}
+            variant="contained"
+            color="primary"
+            onClick={handleJoinLobbyClick}
+          >
+            Join Lobby
+          </Button>
+        </div>
+      </Paper>
+
+      {/* Create Lobby Panel */}
+      <Paper className={classes.createLobbyPanel}>
         <div className={classes.formFields}>
-          <TextField
-            className={clsx(classes.field, classes.nameField)}
-            label="Type your name here"
-            helperText="Name will be displayed to other users"
-            variant="outlined"
-            size="small"
-            name="name"
-            value={fieldValues.name}
-            onChange={handleFieldChange}
-          />
           <TextField
             className={clsx(classes.field, classes.promptField)}
             label="Worker Prompt"
@@ -245,7 +337,7 @@ const Homepage = props => {
             Create New Lobby
           </Button>
         </div>
-      </div>
+      </Paper>
     </div>
   )
 }

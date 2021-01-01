@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Helmet } from 'react-helmet'
+
+import { Helmet } from 'react-helmet-async'
 
 import { makeStyles } from '@material-ui/core/styles'
 
@@ -57,6 +58,8 @@ const Lobby = props => {
   const lobbyCode = props.match.params['lobbyCode']
 
   const [mazeString, setMazeString] = useState('')
+  const [prompt, setPrompt] = useState('')
+  const [numSamples, setNumSamples] = useState('')
 
   useEffect(() => {
     console.log('TASK > LOBBY CODE EFFECT')
@@ -70,6 +73,8 @@ const Lobby = props => {
           console.log('TASK > LOBBY CODE EFFECT > RETRIEVE > maze:')
           console.log(maze)
           setMazeString(maze.maze_string)
+          setPrompt(maze.lobby_prompt)
+          setNumSamples(maze.num_samples)
         }
       } catch (err) {} // do nothing
     }
@@ -90,6 +95,12 @@ const Lobby = props => {
       <Typography variant="h3">Lobby: {lobbyCode}</Typography>
       <div className={classes.mazeContainer}>
         <BlockMazeDisplay mazeString={mazeString} />
+      </div>
+      <div className={classes.promptContainer}>
+        <Typography>{prompt}</Typography>
+      </div>
+      <div className={classes.samplesContainer}>
+        <Typography>{numSamples} samples per worker</Typography>
       </div>
     </div>
   )

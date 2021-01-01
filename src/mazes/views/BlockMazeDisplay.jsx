@@ -162,11 +162,7 @@ const BlockMazeDisplay = props => {
                     </div>
                   )
                 default:
-                  return (
-                    <div className={clsx(classes.mazeBlock, classes.mazeError)} key={colIndex}>
-                      {item}
-                    </div>
-                  )
+                  return <div key={colIndex}></div> // ignore bad/unknown characters like newline chars
               }
             })}
           </div>

@@ -1,3 +1,4 @@
+DROP VIEW lobby_maze_view;
 CREATE VIEW lobby_maze_view AS
 SELECT 
     lob.lobby_id
@@ -11,4 +12,5 @@ SELECT
 FROM lobby lob
 JOIN lobby_maze lma ON lob.lobby_id = lma.lobby_id
 JOIN maze maz ON maz.maze_id = lma.maze_id
+ORDER BY lob.lobby_id DESC
 ;
