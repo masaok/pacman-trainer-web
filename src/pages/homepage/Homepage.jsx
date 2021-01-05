@@ -28,6 +28,7 @@ import { generateMazeGrid } from '../../mazes/RecursiveBacktrackingMaze'
 import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
 
 import { APP_TITLE } from '../../constants'
+import { MAX_RELOADS } from '../../common/constants'
 
 import { dumpGrid } from '../../common/helpers'
 
@@ -191,6 +192,7 @@ const Homepage = props => {
 
   // Database Status
   const [userCount, setUserCount] = useState(0)
+  const [refreshCount, setRefreshCount] = useState(0)
 
   useEffect(() => {
     handleGenerateNewMazeClick()
@@ -209,7 +211,15 @@ const Homepage = props => {
     }
 
     const interval = setInterval(() => {
-      retrieveUserCount()
+      setRefreshCount(refreshes => {
+        if (refreshes < MAX_RELOADS) {
+          console.log('REFRESH COUNT: ' + (refreshes + +1))
+          retrieveUserCount()
+          return refreshes + 1
+        } else {
+          return refreshes > MAX_RELOADS ? MAX_RELOADS : refreshes
+        }
+      })
     }, 2000)
     return () => clearInterval(interval)
   }, [lobbyCode])
@@ -316,6 +326,10 @@ const Homepage = props => {
     history.push(`/${lobbyMaze?.lobby_code}`)
   }
 
+  const handleRefreshStatsClick = () => {
+    setRefreshCount(0)
+  }
+
   // Field Handlers
   const handleFieldChange = event => {
     const newValues = { ...fieldValues, [event.target.name]: event.target.value }
@@ -392,7 +406,20 @@ const Homepage = props => {
         {/* Real Time Stats Panel */}
         <Paper className={classes.realTimeStatsPanel}>
           <Typography className={classes.panelTitle}>Real-time Stats</Typography>
-          <div className={classes.panelInnerContainer}>Users: {userCount}</div>
+          <div className={classes.panelInnerContainer}>
+            Users: {userCount}
+            <br />
+            Refreshes: {refreshCount} / {MAX_RELOADS}
+            <br />
+            <Button
+              className={classes.refreshStatsButton}
+              variant="contained"
+              color="primary"
+              onClick={handleRefreshStatsClick}
+            >
+              Reload Stats
+            </Button>
+          </div>
         </Paper>
       </div>
 
