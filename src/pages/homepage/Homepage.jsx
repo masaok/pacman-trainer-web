@@ -27,10 +27,9 @@ import {
 import { generateMazeGrid } from '../../mazes/RecursiveBacktrackingMaze'
 import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
 
-import { APP_TITLE } from '../../constants'
-import { MAX_RELOADS } from '../../common/constants'
+import { APP_TITLE, MAX_RELOADS } from '../../constants'
 
-import { dumpGrid } from '../../common/helpers'
+import { dumpGrid } from '../../common'
 
 const useStyles = makeStyles(
   theme => ({
@@ -232,6 +231,7 @@ const Homepage = props => {
     // setSeed(Math.random())
   }
 
+  // Create New Lobby Handler
   const handleCreateNewLobbyClick = async () => {
     console.log('HOMEPAGE > HANDLE CREATE NEW LOBBY CLICK')
     console.log('HOMEPAGE > HANDLE CREATE NEW LOBBY CLICK > fieldValues:')
@@ -350,6 +350,12 @@ const Homepage = props => {
   // console.log('MAZE STRING: ' + mazeString)
   // console.log('FIELD VALUES: ')
   // console.log(fieldValues)
+
+  // TODO: Collect browser info on each user for pseudo-identification of the instructor
+  // https://www.w3schools.com/jsref/prop_nav_useragent.asp
+  console.log('NAVIGATOR USER AGENT:')
+  console.log(navigator.userAgent)
+  console.log(navigator.geolocation)
 
   return (
     <div className={classes.root}>

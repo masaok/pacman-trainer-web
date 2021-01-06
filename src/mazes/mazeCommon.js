@@ -1,4 +1,4 @@
-import { SPACE_TOKEN, WALL } from './constants'
+import { SPACE_TOKEN, WALL } from './mazeConstants'
 
 const dumpObject = obj => {
   let result = ''

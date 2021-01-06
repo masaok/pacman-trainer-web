@@ -4,16 +4,14 @@ import { Helmet } from 'react-helmet-async'
 
 import { makeStyles } from '@material-ui/core/styles'
 
-import Button from '@material-ui/core/Button'
-import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
 
 // import RecursiveBacktrackingMaze from '../../mazes/RecursiveBacktrackingMaze'
 import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
 
-import { getLobbyMaze, getNumUsersInLobby } from '../../api'
+import { getLobbyMaze } from '../../api'
 
-import { MAX_RELOADS, SITE_TITLE_POSTFIX } from '../../constants'
+import { SITE_TITLE_POSTFIX } from '../../constants'
 
 const useStyles = makeStyles(
   theme => ({
@@ -52,7 +50,7 @@ const useStyles = makeStyles(
   { name: 'Lobby' }
 )
 
-const Lobby = props => {
+const WorkerLobby = props => {
   const classes = useStyles(props)
 
   // const [seed, setSeed] = useState(Math.random())
@@ -62,9 +60,6 @@ const Lobby = props => {
   const [mazeString, setMazeString] = useState('')
   const [prompt, setPrompt] = useState('')
   const [numSamples, setNumSamples] = useState('')
-
-  const [numUsersInLobby, setNumUsersInLobby] = useState(0)
-  const [refreshCount, setRefreshCount] = useState(0)
 
   useEffect(() => {
     console.log('TASK > LOBBY CODE EFFECT')
@@ -86,70 +81,18 @@ const Lobby = props => {
     retrieveLobbyMaze()
   }, [lobbyCode])
 
-  // Real-time Stats Effect
-  useEffect(() => {
-    console.log('HOMEPAGE > USER COUNT EFFECT')
-
-    const retrieveNumUsersInLobby = async () => {
-      try {
-        const count = await getNumUsersInLobby(lobbyCode)
-        // console.log('HOMEPAGE > USER COUNT EFFECT > userCount:')
-        // console.log(count)
-        setNumUsersInLobby(count)
-      } catch (err) {} // do nothing
-    }
-
-    const interval = setInterval(() => {
-      setRefreshCount(refreshes => {
-        if (refreshes < MAX_RELOADS) {
-          console.log('REFRESH COUNT: ' + (refreshes + +1))
-          retrieveNumUsersInLobby()
-          return refreshes + 1
-        } else {
-          return refreshes > MAX_RELOADS ? MAX_RELOADS : refreshes
-        }
-      })
-    }, 2000)
-    return () => clearInterval(interval)
-  }, [lobbyCode])
-
   // const handleNewMazeClick = () => {
   //   setSeed(Math.random())
   // }
 
   // const handleCreateNewLobbyClick = () => {}
 
-  // Click Handlers
-  const handleRefreshStatsClick = () => {
-    setRefreshCount(0)
-  }
-
   return (
     <div className={classes.root}>
       <Helmet>
-        <title>Lobby {SITE_TITLE_POSTFIX}</title>
+        <title>Worker Lobby {SITE_TITLE_POSTFIX}</title>
       </Helmet>
       <Typography variant="h3">Lobby: {lobbyCode}</Typography>
-
-      {/* Real Time Stats Panel */}
-      <Paper className={classes.realTimeStatsPanel}>
-        <Typography className={classes.panelTitle}>Real-time Stats</Typography>
-        <div className={classes.panelInnerContainer}>
-          Users in this Lobby: {numUsersInLobby}
-          <br />
-          Refreshes: {refreshCount} / {MAX_RELOADS}
-          <br />
-          <Button
-            className={classes.refreshStatsButton}
-            variant="contained"
-            color="primary"
-            onClick={handleRefreshStatsClick}
-          >
-            Reload Stats
-          </Button>
-        </div>
-      </Paper>
-
       <div className={classes.mazeContainer}>
         <BlockMazeDisplay mazeString={mazeString} />
       </div>
@@ -163,4 +106,4 @@ const Lobby = props => {
   )
 }
 
-export default Lobby
+export default WorkerLobby

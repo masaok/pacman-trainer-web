@@ -4,9 +4,7 @@ import clsx from 'clsx'
 
 import { makeStyles } from '@material-ui/core/styles'
 
-// import { dumpGrid } from '../common/helpers'
-
-import { generateInitialMaze } from './common'
+import { generateInitialMaze } from './mazeCommon'
 
 const MAX_GHOSTS = 2
 const MAX_PACMEN = 1
