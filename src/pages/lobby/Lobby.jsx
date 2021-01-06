@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
+import { Link } from 'react-router-dom'
+
 import { Helmet } from 'react-helmet-async'
 
 import { makeStyles } from '@material-ui/core/styles'
@@ -15,8 +17,12 @@ import { getLobbyMaze, getNumUsersInLobby } from '../../api'
 
 import { MAX_RELOADS, SITE_TITLE_POSTFIX } from '../../constants'
 
+import { panelStyles } from '../../commonStyles'
+
 const useStyles = makeStyles(
   theme => ({
+    ...panelStyles(theme),
+
     root: {
       display: 'flex',
       flex: 1,
@@ -55,6 +61,8 @@ const useStyles = makeStyles(
 const Lobby = props => {
   const classes = useStyles(props)
 
+  const { currentUser, currentLobby } = props
+
   // const [seed, setSeed] = useState(Math.random())
 
   const lobbyCode = props.match.params['lobbyCode']
@@ -74,6 +82,7 @@ const Lobby = props => {
     const retrieveLobbyMaze = async () => {
       try {
         if (lobbyCode) {
+          console.log('TASK > LOBBY CODE EFFECT > lobbyCode: ' + lobbyCode)
           const maze = await getLobbyMaze(lobbyCode)
           console.log('TASK > LOBBY CODE EFFECT > RETRIEVE > maze:')
           console.log(maze)
@@ -129,13 +138,19 @@ const Lobby = props => {
       <Helmet>
         <title>Lobby {SITE_TITLE_POSTFIX}</title>
       </Helmet>
+      <Button component={Link} to="/">
+        Homepage
+      </Button>
       <Typography variant="h3">Lobby: {lobbyCode}</Typography>
+      <Typography variant="h3">Creator: {currentLobby?.creator_name}</Typography>
+      <Typography variant="h4">Your user id is: {currentUser?.user_id}</Typography>
+      <Typography variant="h5">Your role is: {currentUser?.role}</Typography>
 
       {/* Real Time Stats Panel */}
       <Paper className={classes.realTimeStatsPanel}>
         <Typography className={classes.panelTitle}>Real-time Stats</Typography>
         <div className={classes.panelInnerContainer}>
-          Users in this Lobby: {numUsersInLobby}
+          Workers in this Lobby: {numUsersInLobby}
           <br />
           Refreshes: {refreshCount} / {MAX_RELOADS}
           <br />

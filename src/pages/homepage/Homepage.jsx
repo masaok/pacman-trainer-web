@@ -31,8 +31,12 @@ import { APP_TITLE, MAX_RELOADS } from '../../constants'
 
 import { dumpGrid } from '../../common'
 
+import { panelStyles } from '../../commonStyles'
+
 const useStyles = makeStyles(
   theme => ({
+    ...panelStyles(theme),
+
     root: {
       display: 'flex',
       flex: 1,
@@ -47,12 +51,6 @@ const useStyles = makeStyles(
       display: 'flex',
       flex: 1,
       margin: theme.spacing(2),
-    },
-
-    panelTitle: {
-      fontWeight: 'bold',
-      fontSize: 22,
-      marginBottom: theme.spacing(2),
     },
 
     // Name Panel
@@ -172,6 +170,8 @@ const useStyles = makeStyles(
 const Homepage = props => {
   const classes = useStyles(props)
 
+  const { handleLobbyChange, handleUserChange } = props
+
   const history = useHistory()
 
   const [fieldValues, setFieldValues] = useState({
@@ -192,6 +192,9 @@ const Homepage = props => {
   // Database Status
   const [userCount, setUserCount] = useState(0)
   const [refreshCount, setRefreshCount] = useState(0)
+
+  // User Role Status
+  // const [role, setRole] = useState('')
 
   useEffect(() => {
     handleGenerateNewMazeClick()
@@ -240,13 +243,16 @@ const Homepage = props => {
     // Create the instructor user
     const payload = {
       name: fieldValues?.name,
-      role: 'instructor',
+      role: 'requester',
     }
 
     const user = await postUser(payload)
     console.log('POST USER > user:')
     console.log(user)
     if (!user) throw new Error('user creation failed')
+
+    console.log('CALLING HANDLE USER CHANGE: ' + user.user_id)
+    handleUserChange(user) // pass to parent
 
     const maze = await postMaze({
       string: mazeString,
@@ -261,9 +267,9 @@ const Homepage = props => {
       createdBy: user.user_id,
     })
     if (!lobby) throw new Error('lobby creation failed')
+    handleLobbyChange(lobby) // pass to parent
     console.log('POST LOBBY > lobby:')
     console.log(lobby)
-    history.push(`/${lobby?.code}`) // API generates the lobby code
 
     const lobbyMaze = await postLobbyMaze({
       lobbyId: lobby.lobby_id,
@@ -271,6 +277,9 @@ const Homepage = props => {
     })
     console.log('POST LOBBY MAZE > lobbyMaze:')
     console.log(lobbyMaze)
+
+    // Redirect to the lobby
+    history.push(`/${lobby?.code}`) // API generates the lobby code
   }
 
   const handleJoinLobbyClick = async () => {
@@ -298,6 +307,7 @@ const Homepage = props => {
     console.log('HANDLE JOIN LOBBY CLICK > lobbyMaze:')
     console.log(lobbyMaze)
     if (!lobbyMaze) throw new Error('lobbyMaze fetch failed')
+    handleLobbyChange(lobbyMaze)
 
     // Create the instructor user
     const payload = {
@@ -310,6 +320,7 @@ const Homepage = props => {
     console.log('HANDLE JOIN LOBBY CLICK > user:')
     console.log(user)
     if (!user) throw new Error('user creation failed')
+    handleUserChange(user)
 
     // Insert the User into the Lobby using the user_lobby table
     const userLobby = await postUserLobby({
@@ -353,9 +364,9 @@ const Homepage = props => {
 
   // TODO: Collect browser info on each user for pseudo-identification of the instructor
   // https://www.w3schools.com/jsref/prop_nav_useragent.asp
-  console.log('NAVIGATOR USER AGENT:')
-  console.log(navigator.userAgent)
-  console.log(navigator.geolocation)
+  // console.log('NAVIGATOR USER AGENT:')
+  // console.log(navigator.userAgent)
+  // console.log(navigator.geolocation)
 
   return (
     <div className={classes.root}>

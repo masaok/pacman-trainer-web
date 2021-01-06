@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 // import { Helmet } from 'react-helmet'
 import { Helmet, HelmetProvider } from 'react-helmet-async'
 
@@ -29,6 +29,26 @@ const useStyles = makeStyles(
 const App = props => {
   const classes = useStyles(props)
 
+  // TODO: These should be updated by fetching the object based on an ID
+  const [currentLobbyId, setCurrentLobbyId] = useState(null)
+  const [currentUserId, setCurrentUserId] = useState(null)
+
+  const [currentLobby, setCurrentLobby] = useState(null)
+  const [currentUser, setCurrentUser] = useState(null)
+
+  // TODO: These should handle ID changes, then fetch more info from the DB
+  const handleLobbyChange = newLobby => {
+    console.log('typeof newUser:')
+    console.log(typeof newUser)
+    setCurrentLobby(newLobby)
+  }
+
+  const handleUserChange = newUser => {
+    console.log('typeof newUser:')
+    console.log(typeof newUser)
+    setCurrentUser(newUser)
+  }
+
   return (
     <HelmetProvider>
       <div className={classes.app}>
@@ -43,8 +63,26 @@ const App = props => {
           <CssBaseline />
           <Router>
             <Switch>
-              <Route exact path="/:lobbyCode" component={Lobby} />
-              <Route exact path="/" component={Homepage} />
+              {/* <Route exact path="/:lobbyCode" component={Lobby} /> */}
+              {/* <Route exact path="/" component={Homepage} /> */}
+              <Route
+                exact
+                path="/:lobbyCode"
+                render={props => (
+                  <Lobby {...props} currentLobby={currentLobby} currentUser={currentUser} />
+                )}
+              />
+              <Route
+                exact
+                path="/"
+                render={props => (
+                  <Homepage
+                    {...props}
+                    handleLobbyChange={handleLobbyChange}
+                    handleUserChange={handleUserChange}
+                  />
+                )}
+              />
             </Switch>
           </Router>
         </ThemeProvider>
