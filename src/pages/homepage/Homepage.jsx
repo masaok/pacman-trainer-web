@@ -26,6 +26,7 @@ import {
 // import RandomMaze from './RandomMaze'
 import { generateMazeGrid } from '../../mazes/RecursiveBacktrackingMaze'
 import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
+import StatsPanel from '../common/StatsPanel'
 
 import { APP_TITLE, MAX_RELOADS } from '../../constants'
 
@@ -46,11 +47,16 @@ const useStyles = makeStyles(
       backgroundColor: theme.palette.primary.light,
     },
 
+    pageTitle: {
+      marginTop: theme.spacing(2),
+      marginBottom: theme.spacing(2),
+    },
+
     // Panel Containers
     topPanels: {
       display: 'flex',
       flex: 1,
-      margin: theme.spacing(2),
+      marginBottom: theme.spacing(2),
     },
 
     // Name Panel
@@ -159,7 +165,7 @@ const useStyles = makeStyles(
       flex: 1,
       flexDirection: 'column',
       alignItems: 'center',
-      marginTop: theme.spacing(3),
+      marginTop: theme.spacing(2),
       marginBottom: theme.spacing(3),
       padding: theme.spacing(3),
     },
@@ -170,7 +176,7 @@ const useStyles = makeStyles(
 const Homepage = props => {
   const classes = useStyles(props)
 
-  const { handleLobbyChange, handleUserChange } = props
+  const { handleLobbyIdChange, handleUserIdChange } = props
 
   const history = useHistory()
 
@@ -252,7 +258,7 @@ const Homepage = props => {
     if (!user) throw new Error('user creation failed')
 
     console.log('CALLING HANDLE USER CHANGE: ' + user.user_id)
-    handleUserChange(user) // pass to parent
+    handleUserIdChange(user.user_id) // pass to parent
 
     const maze = await postMaze({
       string: mazeString,
@@ -267,7 +273,7 @@ const Homepage = props => {
       createdBy: user.user_id,
     })
     if (!lobby) throw new Error('lobby creation failed')
-    handleLobbyChange(lobby) // pass to parent
+    handleLobbyIdChange(lobby.lobby_id) // pass to parent
     console.log('POST LOBBY > lobby:')
     console.log(lobby)
 
@@ -307,12 +313,12 @@ const Homepage = props => {
     console.log('HANDLE JOIN LOBBY CLICK > lobbyMaze:')
     console.log(lobbyMaze)
     if (!lobbyMaze) throw new Error('lobbyMaze fetch failed')
-    handleLobbyChange(lobbyMaze)
+    handleLobbyIdChange(lobbyMaze.lobby_id)
 
-    // Create the instructor user
+    // Create the worker user
     const payload = {
       name: fieldValues?.name,
-      role: 'student',
+      role: 'worker',
     }
 
     // Insert the new User by name
@@ -320,13 +326,14 @@ const Homepage = props => {
     console.log('HANDLE JOIN LOBBY CLICK > user:')
     console.log(user)
     if (!user) throw new Error('user creation failed')
-    handleUserChange(user)
+    handleUserIdChange(user.user_id)
 
     // Insert the User into the Lobby using the user_lobby table
     const userLobby = await postUserLobby({
       userId: user.user_id,
       lobbyId: lobbyMaze.lobby_id,
     })
+    if (!userLobby) throw new Error('userLobby creation failed')
     console.log('HANDLE JOIN LOBBY CLICK > userLobby:')
     console.log(userLobby)
     if (!user) throw new Error('userLobby row creation failed')
@@ -351,6 +358,12 @@ const Homepage = props => {
     setLobbyCode(event.target.value)
   }
 
+  const handleLobbyCodeKeyPress = event => {
+    if (event.key === 'Enter') {
+      return handleJoinLobbyClick()
+    }
+  }
+
   // Text Maze Handlers
   const handleTextMazeChange = event => {
     console.log('HANDLE TEXT MAZE CHANGE > event:')
@@ -358,22 +371,14 @@ const Homepage = props => {
     setMazeString(event.target.value)
   }
 
-  // console.log('MAZE STRING: ' + mazeString)
-  // console.log('FIELD VALUES: ')
-  // console.log(fieldValues)
-
-  // TODO: Collect browser info on each user for pseudo-identification of the instructor
-  // https://www.w3schools.com/jsref/prop_nav_useragent.asp
-  // console.log('NAVIGATOR USER AGENT:')
-  // console.log(navigator.userAgent)
-  // console.log(navigator.geolocation)
-
   return (
     <div className={classes.root}>
       <Helmet>
         <title>{APP_TITLE}</title>
       </Helmet>
-      <Typography variant="h2">{APP_TITLE}</Typography>
+      <Typography variant="h2" className={classes.pageTitle}>
+        {APP_TITLE}
+      </Typography>
 
       <div className={classes.topPanels}>
         {/* Name Panel */}
@@ -405,6 +410,7 @@ const Homepage = props => {
               name="lobbyCode"
               value={lobbyCode}
               onChange={handleLobbyCodeChange}
+              onKeyPress={handleLobbyCodeKeyPress} // allow submit with Enter key
               error={Boolean(lobbyFieldHelperText)}
             />
             <div className={classes.joinLobbyButtonContainer}>
@@ -413,6 +419,7 @@ const Homepage = props => {
                 variant="contained"
                 color="primary"
                 onClick={handleJoinLobbyClick}
+                type="submit"
               >
                 Join Lobby
               </Button>
@@ -421,23 +428,11 @@ const Homepage = props => {
         </Paper>
 
         {/* Real Time Stats Panel */}
-        <Paper className={classes.realTimeStatsPanel}>
-          <Typography className={classes.panelTitle}>Real-time Stats</Typography>
-          <div className={classes.panelInnerContainer}>
-            Users: {userCount}
-            <br />
-            Refreshes: {refreshCount} / {MAX_RELOADS}
-            <br />
-            <Button
-              className={classes.refreshStatsButton}
-              variant="contained"
-              color="primary"
-              onClick={handleRefreshStatsClick}
-            >
-              Reload Stats
-            </Button>
-          </div>
-        </Paper>
+        <StatsPanel
+          userCount={userCount}
+          refreshCount={refreshCount}
+          handleRefreshStatsClick={handleRefreshStatsClick}
+        />
       </div>
 
       {/* Create Lobby Panel */}

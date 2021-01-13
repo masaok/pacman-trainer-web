@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 // import { Helmet } from 'react-helmet'
 import { Helmet, HelmetProvider } from 'react-helmet-async'
 
@@ -12,6 +12,8 @@ import Homepage from './pages/homepage/Homepage'
 import Lobby from './pages/lobby/Lobby'
 
 import theme from './themes/default'
+
+import { getLobbyById, getUserById } from './api'
 
 const useStyles = makeStyles(
   theme => ({
@@ -36,17 +38,47 @@ const App = props => {
   const [currentLobby, setCurrentLobby] = useState(null)
   const [currentUser, setCurrentUser] = useState(null)
 
-  // TODO: These should handle ID changes, then fetch more info from the DB
-  const handleLobbyChange = newLobby => {
-    console.log('typeof newUser:')
-    console.log(typeof newUser)
-    setCurrentLobby(newLobby)
+  // Current Lobby ID Effect
+  useEffect(() => {
+    console.log('APP > LOBBY ID EFFECT')
+
+    const retrieveLobby = async () => {
+      try {
+        const lobby = await getLobbyById(currentLobbyId)
+        console.log('APP > EFFECT > lobby:')
+        console.log(lobby)
+        setCurrentLobby(lobby)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+    if (currentLobbyId) retrieveLobby()
+  }, [currentLobbyId])
+
+  // Current User ID Effect
+  useEffect(() => {
+    console.log('APP > USER ID EFFECT')
+
+    const retrieveUser = async () => {
+      try {
+        const user = await getUserById(currentUserId)
+        console.log('APP > EFFECT > user:')
+        console.log(user)
+        setCurrentUser(user)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+    if (currentUserId) retrieveUser()
+  }, [currentUserId])
+
+  // ID Handlers
+  const handleLobbyIdChange = id => {
+    setCurrentLobbyId(id)
   }
 
-  const handleUserChange = newUser => {
-    console.log('typeof newUser:')
-    console.log(typeof newUser)
-    setCurrentUser(newUser)
+  const handleUserIdChange = id => {
+    setCurrentUserId(id)
   }
 
   return (
@@ -78,8 +110,8 @@ const App = props => {
                 render={props => (
                   <Homepage
                     {...props}
-                    handleLobbyChange={handleLobbyChange}
-                    handleUserChange={handleUserChange}
+                    handleLobbyIdChange={handleLobbyIdChange}
+                    handleUserIdChange={handleUserIdChange}
                   />
                 )}
               />

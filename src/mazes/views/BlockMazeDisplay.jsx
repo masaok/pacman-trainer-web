@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 
 import clsx from 'clsx'
 
+import PropTypes from 'prop-types'
+
 import { makeStyles } from '@material-ui/core/styles'
 
 const showRemovals = true
@@ -170,6 +172,10 @@ const BlockMazeDisplay = props => {
       })}
     </div>
   )
+}
+
+BlockMazeDisplay.propTypes = {
+  mazeString: PropTypes.string.isRequired,
 }
 
 export default BlockMazeDisplay
