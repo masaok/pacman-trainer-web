@@ -35,6 +35,18 @@ let theme = createMuiTheme({
       fontFamily: ['Open Sans', 'sans-serif'].join(','),
     },
   },
+
+  // Override theme globally
+  // https://github.com/mui-org/material-ui/issues/12654#issuecomment-529517398
+  overrides: {
+    MuiCssBaseline: {
+      '@global': {
+        body: {
+          backgroundColor: '#fff',
+        },
+      },
+    },
+  },
 })
 theme = responsiveFontSizes(theme)
 

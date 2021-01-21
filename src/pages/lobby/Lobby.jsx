@@ -9,6 +9,8 @@ import { makeStyles } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 
+import WorkerLobby from './WorkerLobby'
+
 import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
 import StatsPanel from '../common/StatsPanel'
 
@@ -132,33 +134,50 @@ const Lobby = props => {
 
   return (
     <div className={classes.root}>
-      <Helmet>
-        <title>Lobby {SITE_TITLE_POSTFIX}</title>
-      </Helmet>
-      <Button component={Link} to="/">
-        Homepage
-      </Button>
-      <Typography variant="h3">Lobby: {lobbyCode}</Typography>
-      <Typography variant="h3">Creator Name: {currentLobby?.creator_name}</Typography>
-      <Typography variant="h4">Your user id is: {currentUser?.user_id}</Typography>
-      <Typography variant="h5">Your role is: {currentUser?.role}</Typography>
+      {currentUser?.role === 'requester' ? (
+        <>
+          <Helmet>
+            <title>Lobby {SITE_TITLE_POSTFIX}</title>
+          </Helmet>
+          <Button component={Link} to="/">
+            Homepage
+          </Button>
+          <Typography variant="h3">Lobby: {lobbyCode}</Typography>
+          <Typography variant="h3">Creator Name: {currentLobby?.creator_name}</Typography>
+          <Typography variant="h4">Your user id is: {currentUser?.user_id}</Typography>
+          <Typography variant="h5">Your role is: {currentUser?.role}</Typography>
 
-      {/* Real Time Stats Panel */}
-      <StatsPanel
-        numUsersInLobby={numUsersInLobby}
-        refreshCount={refreshCount}
-        handleRefreshStatsClick={handleRefreshStatsClick}
-      />
+          {/* Real Time Stats Panel */}
+          <StatsPanel
+            numUsersInLobby={numUsersInLobby}
+            refreshCount={refreshCount}
+            handleRefreshStatsClick={handleRefreshStatsClick}
+          />
 
-      <div className={classes.mazeContainer}>
-        <BlockMazeDisplay mazeString={mazeString} />
-      </div>
-      <div className={classes.promptContainer}>
-        <Typography>{prompt}</Typography>
-      </div>
-      <div className={classes.samplesContainer}>
-        <Typography>{numSamples} samples per worker</Typography>
-      </div>
+          <div className={classes.mazeContainer}>
+            <BlockMazeDisplay mazeString={mazeString} />
+          </div>
+          <div className={classes.promptContainer}>
+            <Typography>{prompt}</Typography>
+          </div>
+          <div className={classes.samplesContainer}>
+            <Typography>{numSamples} samples per worker</Typography>
+          </div>
+        </>
+      ) : (
+        <WorkerLobby
+          lobbyCode={lobbyCode}
+          currentLobby={currentLobby}
+          currentUser={currentUser}
+          numUsersInLobby={numUsersInLobby}
+          refreshCount={refreshCount}
+          handleRefreshStatsClick={handleRefreshStatsClick}
+          mazeString={mazeString}
+          prompt={prompt}
+          numSamples={numSamples}
+          // {...props}
+        />
+      )}
     </div>
   )
 }

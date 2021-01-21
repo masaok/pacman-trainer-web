@@ -215,7 +215,9 @@ const Homepage = props => {
         // console.log('HOMEPAGE > USER COUNT EFFECT > userCount:')
         // console.log(count)
         setUserCount(count)
-      } catch (err) {} // do nothing
+      } catch (err) {
+        console.error(err)
+      }
     }
 
     const interval = setInterval(() => {

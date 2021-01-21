@@ -22,7 +22,7 @@ const useStyles = makeStyles(
       height: '100vh',
       padding: 0,
       margin: 0,
-      backgroundColor: theme.palette.common.white, // switch to black for debugging
+      // backgroundColor: theme.palette.common.white, // switch to black for debugging
     },
   }),
   { name: 'App' }
