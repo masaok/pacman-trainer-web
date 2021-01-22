@@ -11,6 +11,7 @@ import IconButton from '@material-ui/core/IconButton'
 import Typography from '@material-ui/core/Typography'
 
 import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
+import StatsBar from '../common/StatsBar'
 import StatsPanel from '../common/StatsPanel'
 
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
@@ -27,6 +28,10 @@ const useStyles = makeStyles(
       flex: 1,
       flexDirection: 'column',
       alignItems: 'center',
+    },
+
+    statsBar: {
+      marginTop: theme.spacing(1),
     },
 
     workspace: {
@@ -86,10 +91,19 @@ const useStyles = makeStyles(
       display: 'flex',
       flex: 1,
       justifyContent: 'space-between',
-      width: 150,
+      width: 225,
+    },
+
+    arrowButton: {
+      backgroundColor: 'lightblue',
+    },
+
+    arrowIcon: {
+      height: 50,
+      width: 50,
     },
   }),
-  { name: 'Lobby' }
+  { name: 'WorkerLobby' }
 )
 
 const WorkerLobby = props => {
@@ -112,10 +126,13 @@ const WorkerLobby = props => {
       <Helmet>
         <title>Worker Lobby {SITE_TITLE_POSTFIX}</title>
       </Helmet>
-      <Typography variant="h3">Lobby: {lobbyCode}</Typography>
-      <Button component={Link} to="/">
-        Homepage
-      </Button>
+      <StatsBar
+        className={classes.statsBar}
+        lobbyCode={lobbyCode}
+        numUsersInLobby={numUsersInLobby}
+        refreshCount={refreshCount}
+        handleRefreshStatsClick={handleRefreshStatsClick}
+      />
       <div className={classes.workspace}>
         <div className={classes.workspaceTop}>
           <div className={classes.mazeContainer}>
@@ -136,32 +153,26 @@ const WorkerLobby = props => {
         <div className={classes.workspaceBottom}>
           <div className={classes.arrows}>
             <div className={classes.upArrow}>
-              <IconButton>
-                <KeyboardArrowUpIcon />
+              <IconButton className={classes.arrowButton}>
+                <KeyboardArrowUpIcon className={classes.arrowIcon} />
               </IconButton>
             </div>
             <div className={classes.sideArrows}>
-              <IconButton>
-                <KeyboardArrowLeftIcon />
+              <IconButton className={classes.arrowButton}>
+                <KeyboardArrowLeftIcon className={classes.arrowIcon} />
               </IconButton>
-              <IconButton>
-                <KeyboardArrowRightIcon />
+              <IconButton className={classes.arrowButton}>
+                <KeyboardArrowRightIcon className={classes.arrowIcon} />
               </IconButton>
             </div>
             <div className={classes.downArrow}>
-              <IconButton>
-                <KeyboardArrowDownIcon />
+              <IconButton className={classes.arrowButton}>
+                <KeyboardArrowDownIcon className={classes.arrowIcon} />
               </IconButton>
             </div>
           </div>
         </div>
       </div>
-      {/* Real Time Stats Panel */}
-      <StatsPanel
-        numUsersInLobby={numUsersInLobby}
-        refreshCount={refreshCount}
-        handleRefreshStatsClick={handleRefreshStatsClick}
-      />
     </div>
   )
 }
