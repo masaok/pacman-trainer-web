@@ -38,6 +38,7 @@ const post = (resource, payload) => {
 // Lobby GETs
 const getLobbyById = lobbyId => get(`lobby/${lobbyId}`).then(result => result)
 const getLobbyMaze = lobbyCode => get(`lobbyMaze/${lobbyCode}`).then(result => result)
+const getLobbyMazeByHash = lobbyHash => get(`lobbyMazeByHash/${lobbyHash}`).then(result => result)
 const getNumUsersInLobby = lobbyCode =>
   get(`numUsersInLobby/${lobbyCode}`).then(result => result.count)
 
@@ -55,6 +56,7 @@ const postLobbyMaze = payload => post(`lobbyMaze`, payload).then(result => resul
 export {
   getLobbyById,
   getLobbyMaze,
+  getLobbyMazeByHash,
   getNumUsersInLobby,
   getUserById,
   getUserCount,

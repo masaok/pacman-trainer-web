@@ -99,6 +99,19 @@ const App = props => {
               {/* <Route exact path="/" component={Homepage} /> */}
               <Route
                 exact
+                path="/r/:lobbyHash"
+                render={props => (
+                  <Lobby
+                    {...props}
+                    currentLobby={currentLobby}
+                    currentUser={currentUser}
+                    handleLobbyIdChange={handleLobbyIdChange}
+                    handleUserIdChange={handleUserIdChange}
+                  />
+                )}
+              />
+              <Route
+                exact
                 path="/:lobbyCode"
                 render={props => (
                   <Lobby {...props} currentLobby={currentLobby} currentUser={currentUser} />

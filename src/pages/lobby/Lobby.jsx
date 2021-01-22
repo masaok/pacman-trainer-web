@@ -1,20 +1,17 @@
 import React, { useEffect, useState } from 'react'
 
-import { Link } from 'react-router-dom'
-
 import { Helmet } from 'react-helmet-async'
 
 import { makeStyles } from '@material-ui/core/styles'
 
-import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 
 import WorkerLobby from './WorkerLobby'
 
 import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
-import StatsPanel from '../common/StatsPanel'
+import StatsBar from '../common/StatsBar'
 
-import { getLobbyMaze, getNumUsersInLobby } from '../../api'
+import { getLobbyMaze, getLobbyMazeByHash, getNumUsersInLobby } from '../../api'
 
 import { MAX_RELOADS, SITE_TITLE_POSTFIX } from '../../constants'
 
@@ -62,11 +59,12 @@ const useStyles = makeStyles(
 const Lobby = props => {
   const classes = useStyles(props)
 
-  const { currentUser, currentLobby } = props
+  const { currentUser, currentLobby, handleLobbyIdChange, handleUserIdChange } = props
 
   // const [seed, setSeed] = useState(Math.random())
 
   const lobbyCode = props.match.params['lobbyCode']
+  const lobbyHash = props.match.params['lobbyHash']
 
   const [mazeString, setMazeString] = useState('')
   const [prompt, setPrompt] = useState('')
@@ -75,6 +73,32 @@ const Lobby = props => {
   const [numUsersInLobby, setNumUsersInLobby] = useState(0)
   const [refreshCount, setRefreshCount] = useState(0)
 
+  // Lobby Hash Effect (Requester)
+  useEffect(() => {
+    console.log('LOBBY HASH EFFECT')
+
+    const retrieveLobbyMaze = async () => {
+      try {
+        if (!lobbyHash) throw new Error('lobbyHash missing')
+        console.log('LOBBY HASH EFFECT > lobbyHash: ' + lobbyHash)
+        const maze = await getLobbyMazeByHash(lobbyHash)
+        console.log('LOBBY HASH EFFECT > RETRIEVE > maze:')
+        console.log(maze)
+        setMazeString(maze.maze_string)
+        setPrompt(maze.lobby_prompt)
+        setNumSamples(maze.num_samples)
+
+        // Set the App Lobby and User based on the URL (allows browser reloading)
+        handleLobbyIdChange(maze.lobby_id)
+        handleUserIdChange(maze.creator_id)
+      } catch (err) {
+        console.error(err)
+      }
+    }
+    retrieveLobbyMaze()
+  }, [lobbyHash])
+
+  // Lobby Code Effect (Worker)
   useEffect(() => {
     console.log('TASK > LOBBY CODE EFFECT')
 
@@ -134,25 +158,22 @@ const Lobby = props => {
 
   return (
     <div className={classes.root}>
-      {currentUser?.role === 'requester' ? (
+      {/* {currentUser?.role === 'requester' ? ( */}
+      {lobbyHash ? (
         <>
           <Helmet>
             <title>Lobby {SITE_TITLE_POSTFIX}</title>
           </Helmet>
-          <Button component={Link} to="/">
-            Homepage
-          </Button>
-          <Typography variant="h3">Lobby: {lobbyCode}</Typography>
-          <Typography variant="h3">Creator Name: {currentLobby?.creator_name}</Typography>
-          <Typography variant="h4">Your user id is: {currentUser?.user_id}</Typography>
-          <Typography variant="h5">Your role is: {currentUser?.role}</Typography>
-
-          {/* Real Time Stats Panel */}
-          <StatsPanel
+          <StatsBar
+            className={classes.statsBar}
+            lobbyCode={lobbyCode}
             numUsersInLobby={numUsersInLobby}
             refreshCount={refreshCount}
             handleRefreshStatsClick={handleRefreshStatsClick}
           />
+          <Typography variant="h3">Creator Name: {currentLobby?.creator_name}</Typography>
+          <Typography variant="h4">Your user id is: {currentUser?.user_id}</Typography>
+          <Typography variant="h5">Your role is: {currentUser?.role}</Typography>
 
           <div className={classes.mazeContainer}>
             <BlockMazeDisplay mazeString={mazeString} />

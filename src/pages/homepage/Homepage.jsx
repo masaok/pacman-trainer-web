@@ -287,7 +287,8 @@ const Homepage = props => {
     console.log(lobbyMaze)
 
     // Redirect to the lobby
-    history.push(`/${lobby?.code}`) // API generates the lobby code
+    // history.push(`/${lobby?.code}`) // API generates the lobby code
+    history.push(`/r/${lobby?.hash}`) // API generates the lobby code
   }
 
   const handleJoinLobbyClick = async () => {
