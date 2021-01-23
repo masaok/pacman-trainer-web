@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
+import PropTypes from 'prop-types'
+
 import { Helmet } from 'react-helmet-async'
 
 import { makeStyles } from '@material-ui/core/styles'
@@ -134,12 +136,8 @@ const WorkerLobby = props => {
             actions,
           }
 
-          // Insert the new User by name
           const userLobby = await patchUserLobby(userId, lobbyId, payload)
-          console.log('WORK LOBBY > ACTIONS EFFECT > userLobby:')
           console.log(userLobby)
-          // if (!user) throw new Error('user creation failed')
-          // handleUserIdChange(user.user_id)
         }
       } catch (err) {
         console.error(err)
@@ -217,6 +215,19 @@ const WorkerLobby = props => {
       </div>
     </div>
   )
+}
+
+WorkerLobby.propTypes = {
+  lobbyId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  lobbyCode: PropTypes.string.isRequired,
+  userId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  userName: PropTypes.string.isRequired,
+  numUsersInLobby: PropTypes.number.isRequired,
+  refreshCount: PropTypes.number.isRequired,
+  handleRefreshStatsClick: PropTypes.func.isRequired,
+  mazeString: PropTypes.string.isRequired,
+  prompt: PropTypes.string.isRequired,
+  numSamples: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 }
 
 export default WorkerLobby

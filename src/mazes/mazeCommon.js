@@ -26,4 +26,10 @@ const generateInitialMaze = (width, height) => {
   return newMaze
 }
 
+// TODO: Given a mazeString, convert into a 2D array
+
+// TODO: Given a 2D array maze, randomize the placement of pacman, ghosts, and pellets
+
+// TODO: Given a 2D array maze, convert into a mazeString
+
 export { dumpObject, generateInitialMaze }

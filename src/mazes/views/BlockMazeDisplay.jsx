@@ -6,6 +6,9 @@ import PropTypes from 'prop-types'
 
 import { makeStyles } from '@material-ui/core/styles'
 
+import pacmanImage from '../../assets/images/pacman-542x571.png'
+import ghostImage from '../../assets/images/ghost-red-980x980.png'
+
 const showRemovals = true
 const REMOVAL_TOKEN = showRemovals ? '-' : ' ' // using middot instead for now
 const SPACE_TOKEN = '.'
@@ -42,6 +45,8 @@ const useStyles = makeStyles(
       maxWidth: 50,
       justifyContent: 'center',
       alignItems: 'center',
+      backgroundColor: 'black',
+      color: 'white',
     },
 
     mazeSpace: {
@@ -82,21 +87,28 @@ const useStyles = makeStyles(
     mazeError: {
       backgroundColor: 'red',
     },
+
+    // Sprites (Pacman, Ghosts, Walls, etc.)
+    spriteContainer: {
+      display: 'flex',
+      flex: 1,
+      backgroundColor: 'black',
+      padding: theme.spacing(1),
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+
+    sprite: {
+      width: '100%',
+      height: 'auto',
+    },
+
+    pellet: {
+      fontSize: 100,
+    },
   }),
   { name: 'BlockMazeDisplay' }
 )
-
-// const mazeString = `
-// XXXXXXXXXXX
-// X.........X
-// X.XGX.X.X.X
-// X....OX.O.X
-// X.X.X.X.X.X
-// X....OX.X.X
-// X.XXX.X.X.X
-// X.P.....G.X
-// XXXXXXXXXXX
-// `
 
 const BlockMazeDisplay = props => {
   const classes = useStyles(props)
@@ -104,6 +116,7 @@ const BlockMazeDisplay = props => {
   const { mazeString } = props
 
   const [maze, setMaze] = useState([])
+  const [debug] = useState(false)
 
   useEffect(() => {
     const grid = []
@@ -129,32 +142,45 @@ const BlockMazeDisplay = props => {
                 case SOUTH:
                   return (
                     <div className={clsx(classes.mazeBlock, classes.mazeSpace)} key={colIndex}>
-                      {/* {item} */}
                       &middot;
                     </div>
                   )
                 case GHOST:
                   return (
-                    <div className={clsx(classes.mazeBlock, classes.mazeGhost)} key={colIndex}>
-                      {item}
+                    <div
+                      className={clsx(classes.mazeBlock, debug ? classes.mazeGhost : null)}
+                      key={colIndex}
+                    >
+                      {debug ? (
+                        item
+                      ) : (
+                        <div className={classes.spriteContainer}>
+                          <img className={classes.sprite} src={ghostImage} alt="ghost" />
+                        </div>
+                      )}
                     </div>
                   )
                 case PELLET:
                   return (
-                    <div className={clsx(classes.mazeBlock, classes.mazePellet)} key={colIndex}>
-                      {item}
+                    <div
+                      className={clsx(classes.mazeBlock, debug ? classes.mazePellet : null)}
+                      key={colIndex}
+                    >
+                      {debug ? item : <div className={classes.pellet}>&middot;</div>}
                     </div>
                   )
                 case PACMAN:
                   return (
-                    <div className={clsx(classes.mazeBlock, classes.mazePacman)} key={colIndex}>
-                      {item}
+                    <div className={classes.mazeBlock} key={colIndex}>
+                      <div className={classes.spriteContainer}>
+                        <img className={classes.sprite} src={pacmanImage} alt="pacman" />
+                      </div>
                     </div>
                   )
                 case WALL:
                   return (
                     <div className={clsx(classes.mazeBlock, classes.mazeWall)} key={colIndex}>
-                      {item}
+                      {debug ? item : <>&nbsp;</>}
                     </div>
                   )
                 case REMOVAL_TOKEN:
