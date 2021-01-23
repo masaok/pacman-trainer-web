@@ -1,18 +1,14 @@
-import React from 'react'
-
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
 
 import { Helmet } from 'react-helmet-async'
 
 import { makeStyles } from '@material-ui/core/styles'
 
-import Button from '@material-ui/core/Button'
 import IconButton from '@material-ui/core/IconButton'
 import Typography from '@material-ui/core/Typography'
 
 import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
 import StatsBar from '../common/StatsBar'
-import StatsPanel from '../common/StatsPanel'
 
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft'
@@ -20,6 +16,8 @@ import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 
 import { SITE_TITLE_POSTFIX } from '../../constants'
+
+import { patchUserLobby } from '../../api'
 
 const useStyles = makeStyles(
   theme => ({
@@ -110,9 +108,11 @@ const WorkerLobby = props => {
   const classes = useStyles(props)
 
   const {
+    lobbyId,
     lobbyCode,
-    // currentLobby,
-    // currentUser,
+    userId,
+    userName,
+    userRole,
     numUsersInLobby,
     refreshCount,
     handleRefreshStatsClick,
@@ -120,6 +120,45 @@ const WorkerLobby = props => {
     prompt,
     numSamples,
   } = props
+
+  const [actions, setActions] = useState([])
+
+  // Actions Effect
+  useEffect(() => {
+    console.log('WORK LOBBY > ACTIONS EFFECT')
+
+    const updateUserLobby = async () => {
+      try {
+        if (userId && lobbyId) {
+          const payload = {
+            actions,
+          }
+
+          // Insert the new User by name
+          const userLobby = await patchUserLobby(userId, lobbyId, payload)
+          console.log('WORK LOBBY > ACTIONS EFFECT > userLobby:')
+          console.log(userLobby)
+          // if (!user) throw new Error('user creation failed')
+          // handleUserIdChange(user.user_id)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    }
+    updateUserLobby()
+  }, [actions])
+
+  const handleArrowClick = (event, direction) => {
+    console.log('ARROW CLICK: ' + direction)
+    const newAction = {
+      boardState: mazeString,
+      action: direction,
+    }
+
+    const newActions = [...actions, newAction]
+    console.log(newActions)
+    setActions(newActions)
+  }
 
   return (
     <div className={classes.root}>
@@ -129,6 +168,9 @@ const WorkerLobby = props => {
       <StatsBar
         className={classes.statsBar}
         lobbyCode={lobbyCode}
+        userId={userId}
+        userName={userName}
+        userRole={userRole}
         numUsersInLobby={numUsersInLobby}
         refreshCount={refreshCount}
         handleRefreshStatsClick={handleRefreshStatsClick}
@@ -153,20 +195,20 @@ const WorkerLobby = props => {
         <div className={classes.workspaceBottom}>
           <div className={classes.arrows}>
             <div className={classes.upArrow}>
-              <IconButton className={classes.arrowButton}>
+              <IconButton className={classes.arrowButton} onClick={e => handleArrowClick(e, 'U')}>
                 <KeyboardArrowUpIcon className={classes.arrowIcon} />
               </IconButton>
             </div>
             <div className={classes.sideArrows}>
-              <IconButton className={classes.arrowButton}>
+              <IconButton className={classes.arrowButton} onClick={e => handleArrowClick(e, 'L')}>
                 <KeyboardArrowLeftIcon className={classes.arrowIcon} />
               </IconButton>
-              <IconButton className={classes.arrowButton}>
+              <IconButton className={classes.arrowButton} onClick={e => handleArrowClick(e, 'R')}>
                 <KeyboardArrowRightIcon className={classes.arrowIcon} />
               </IconButton>
             </div>
             <div className={classes.downArrow}>
-              <IconButton className={classes.arrowButton}>
+              <IconButton className={classes.arrowButton} onClick={e => handleArrowClick(e, 'D')}>
                 <KeyboardArrowDownIcon className={classes.arrowIcon} />
               </IconButton>
             </div>

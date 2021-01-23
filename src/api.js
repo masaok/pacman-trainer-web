@@ -25,6 +25,16 @@ const get = resource => {
   })
 }
 
+const patch = (resource, payload) => {
+  const options = {
+    method: 'PATCH',
+    headers: { ...BASE_API_REQUEST_HEADER },
+    body: payload ? JSON.stringify(payload) : null,
+  }
+
+  return fetch(urlFor(resource), options).then(response => response?.json())
+}
+
 const post = (resource, payload) => {
   const options = {
     method: 'POST',
@@ -39,6 +49,9 @@ const post = (resource, payload) => {
 const getLobbyById = lobbyId => get(`lobby/${lobbyId}`).then(result => result)
 const getLobbyMaze = lobbyCode => get(`lobbyMaze/${lobbyCode}`).then(result => result)
 const getLobbyMazeByHash = lobbyHash => get(`lobbyMazeByHash/${lobbyHash}`).then(result => result)
+const getUserLobbyMazeByHash = userLobbyHash =>
+  get(`userLobbyMazeByHash/${userLobbyHash}`).then(result => result)
+
 const getNumUsersInLobby = lobbyCode =>
   get(`numUsersInLobby/${lobbyCode}`).then(result => result.count)
 
@@ -46,7 +59,11 @@ const getNumUsersInLobby = lobbyCode =>
 const getUserById = userId => get(`user/${userId}`).then(result => result)
 const getUserCount = () => get(`userCount`).then(result => result.count)
 
-// POSTs
+// PATCHes (updates)
+const patchUserLobby = (userId, lobbyId, payload) =>
+  patch(`userLobby/${userId}/${lobbyId}`, payload).then(result => result.userLobby)
+
+// POSTs (creates)
 const postUser = payload => post(`user`, payload).then(result => result.user)
 const postUserLobby = payload => post(`userLobby`, payload).then(result => result.userLobby)
 const postMaze = payload => post(`maze`, payload).then(result => result.maze)
@@ -54,12 +71,17 @@ const postLobby = payload => post(`lobby`, payload).then(result => result.lobby)
 const postLobbyMaze = payload => post(`lobbyMaze`, payload).then(result => result.lobbyMaze)
 
 export {
+  // GETs
   getLobbyById,
   getLobbyMaze,
   getLobbyMazeByHash,
+  getUserLobbyMazeByHash,
   getNumUsersInLobby,
   getUserById,
   getUserCount,
+  // PATCHes
+  patchUserLobby,
+  // POSTs
   postLobby,
   postLobbyMaze,
   postMaze,

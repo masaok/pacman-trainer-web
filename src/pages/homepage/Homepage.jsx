@@ -342,9 +342,13 @@ const Homepage = props => {
     if (!user) throw new Error('userLobby row creation failed')
 
     // Redirect the User to the Lobby and display the maze and prompt
-    console.log('HANDLE JOIN LOBBY CLICK > REDIRECT to lobby:')
-    console.log(lobbyMaze.lobby_code)
-    history.push(`/${lobbyMaze?.lobby_code}`)
+    // console.log('HANDLE JOIN LOBBY CLICK > REDIRECT to lobby:')
+    // console.log(lobbyMaze.lobby_code)
+    // history.push(`/${lobbyMaze?.lobby_code}`)
+
+    const redirectPath = `/w/${userLobby?.hash}`
+    console.log('HOMEPAGE > REDIRECT TO: ' + redirectPath)
+    history.push(redirectPath)
   }
 
   const handleRefreshStatsClick = () => {

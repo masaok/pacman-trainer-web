@@ -112,6 +112,19 @@ const App = props => {
               />
               <Route
                 exact
+                path="/w/:userLobbyHash"
+                render={props => (
+                  <Lobby
+                    {...props}
+                    currentLobby={currentLobby}
+                    currentUser={currentUser}
+                    handleLobbyIdChange={handleLobbyIdChange}
+                    handleUserIdChange={handleUserIdChange}
+                  />
+                )}
+              />
+              <Route
+                exact
                 path="/:lobbyCode"
                 render={props => (
                   <Lobby {...props} currentLobby={currentLobby} currentUser={currentUser} />

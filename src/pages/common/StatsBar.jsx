@@ -58,6 +58,7 @@ const useStyles = makeStyles(
       flex: 1,
       justifyContent: 'center',
       fontWeight: 'bold',
+      whiteSpace: 'nowrap',
     },
 
     button: {
@@ -70,12 +71,29 @@ const useStyles = makeStyles(
 const StatsBar = props => {
   const classes = useStyles(props)
 
-  const { lobbyCode, userCount, numUsersInLobby, refreshCount, handleRefreshStatsClick } = props
+  const {
+    lobbyCode,
+    userId,
+    userName,
+    userRole,
+    userCount,
+    numUsersInLobby,
+    refreshCount,
+    handleRefreshStatsClick,
+  } = props
 
   const data = [
     {
       field: 'Lobby',
       value: lobbyCode,
+    },
+    {
+      field: 'Role',
+      value: userRole,
+    },
+    {
+      field: 'User Name (ID)',
+      value: `${userName} (${userId})`,
     },
     {
       field: 'Users',
@@ -106,11 +124,11 @@ const StatsBar = props => {
             Homepage
           </Button>
         </div>
-        {data.map(item => {
+        {data.map((item, index) => {
           return item.value === undefined ? (
             ''
           ) : (
-            <div className={classes.statsPair}>
+            <div className={classes.statsPair} key={index}>
               <div className={classes.statsField}>{item.field}</div>
               <div className={classes.statsValue}>{item.value}</div>
             </div>

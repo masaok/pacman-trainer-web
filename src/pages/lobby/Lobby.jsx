@@ -11,7 +11,7 @@ import WorkerLobby from './WorkerLobby'
 import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
 import StatsBar from '../common/StatsBar'
 
-import { getLobbyMaze, getLobbyMazeByHash, getNumUsersInLobby } from '../../api'
+import { getLobbyMazeByHash, getUserLobbyMazeByHash, getNumUsersInLobby } from '../../api'
 
 import { MAX_RELOADS, SITE_TITLE_POSTFIX } from '../../constants'
 
@@ -59,12 +59,17 @@ const useStyles = makeStyles(
 const Lobby = props => {
   const classes = useStyles(props)
 
-  const { currentUser, currentLobby, handleLobbyIdChange, handleUserIdChange } = props
+  const { handleLobbyIdChange, handleUserIdChange } = props
 
-  // const [seed, setSeed] = useState(Math.random())
+  const lobbyHashParam = props.match.params['lobbyHash']
+  const userLobbyHashParam = props.match.params['userLobbyHash']
 
-  const lobbyCode = props.match.params['lobbyCode']
-  const lobbyHash = props.match.params['lobbyHash']
+  const [lobbyId, setLobbyId] = useState('')
+  const [lobbyCode, setLobbyCode] = useState('')
+
+  const [userId, setUserId] = useState(null)
+  const [userName, setUserName] = useState('')
+  const [userRole, setUserRole] = useState('')
 
   const [mazeString, setMazeString] = useState('')
   const [prompt, setPrompt] = useState('')
@@ -79,48 +84,67 @@ const Lobby = props => {
 
     const retrieveLobbyMaze = async () => {
       try {
-        if (!lobbyHash) throw new Error('lobbyHash missing')
-        console.log('LOBBY HASH EFFECT > lobbyHash: ' + lobbyHash)
-        const maze = await getLobbyMazeByHash(lobbyHash)
-        console.log('LOBBY HASH EFFECT > RETRIEVE > maze:')
-        console.log(maze)
-        setMazeString(maze.maze_string)
-        setPrompt(maze.lobby_prompt)
-        setNumSamples(maze.num_samples)
-
-        // Set the App Lobby and User based on the URL (allows browser reloading)
-        handleLobbyIdChange(maze.lobby_id)
-        handleUserIdChange(maze.creator_id)
-      } catch (err) {
-        console.error(err)
-      }
-    }
-    retrieveLobbyMaze()
-  }, [lobbyHash])
-
-  // Lobby Code Effect (Worker)
-  useEffect(() => {
-    console.log('TASK > LOBBY CODE EFFECT')
-
-    // console.log('TASK > FIRST LOAD EFFECT > lobbyCode: ' + lobbyCode)
-
-    const retrieveLobbyMaze = async () => {
-      try {
-        if (lobbyCode) {
-          console.log('TASK > LOBBY CODE EFFECT > lobbyCode: ' + lobbyCode)
-          const maze = await getLobbyMaze(lobbyCode)
-          console.log('TASK > LOBBY CODE EFFECT > RETRIEVE > maze:')
+        if (lobbyHashParam) {
+          console.log('LOBBY HASH EFFECT > lobbyHashParam: ' + lobbyHashParam)
+          const maze = await getLobbyMazeByHash(lobbyHashParam)
+          console.log('LOBBY HASH EFFECT > RETRIEVE > maze:')
           console.log(maze)
           setMazeString(maze.maze_string)
           setPrompt(maze.lobby_prompt)
           setNumSamples(maze.num_samples)
+
+          // Set local values based on URL params
+          setLobbyCode(maze.lobby_code)
+
+          setUserId(maze.creator_id)
+          setUserName(maze.creator_name)
+          setUserRole(maze.creator_role)
+
+          // Set the App Lobby and User based on the URL (allows browser reloading)
+          handleLobbyIdChange(maze.lobby_id)
+          handleUserIdChange(maze.creator_id)
         }
       } catch (err) {
         console.error(err)
       }
     }
     retrieveLobbyMaze()
-  }, [lobbyCode])
+  }, [lobbyHashParam])
+
+  // User Lobby Hash Effect (Worker)
+  useEffect(() => {
+    console.log('USER LOBBY HASH EFFECT')
+
+    const retrieveUserLobbyMaze = async () => {
+      try {
+        // if (!lobbyHashParam) throw new Error('lobbyHashParam missing')
+        if (userLobbyHashParam) {
+          console.log('USER LOBBY HASH EFFECT > lobbyHashParam: ' + lobbyHashParam)
+          const maze = await getUserLobbyMazeByHash(userLobbyHashParam)
+          console.log('USER LOBBY HASH EFFECT > RETRIEVE > maze:')
+          console.log(maze)
+          setMazeString(maze.maze_string)
+          setPrompt(maze.lobby_prompt)
+          setNumSamples(maze.num_samples)
+
+          // Set local values based on URL params
+          setLobbyId(maze.lobby_id)
+          setLobbyCode(maze.lobby_code)
+
+          setUserId(maze.user_id)
+          setUserName(maze.user_name)
+          setUserRole(maze.user_role)
+
+          // Set the App Lobby and User based on the URL (allows browser reloading)
+          handleLobbyIdChange(maze.lobby_id)
+          handleUserIdChange(maze.creator_id)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    }
+    retrieveUserLobbyMaze()
+  }, [userLobbyHashParam])
 
   // Real-time Stats Effect
   useEffect(() => {
@@ -159,22 +183,21 @@ const Lobby = props => {
   return (
     <div className={classes.root}>
       {/* {currentUser?.role === 'requester' ? ( */}
-      {lobbyHash ? (
+      {lobbyHashParam ? (
         <>
           <Helmet>
-            <title>Lobby {SITE_TITLE_POSTFIX}</title>
+            <title>Requester Lobby {SITE_TITLE_POSTFIX}</title>
           </Helmet>
           <StatsBar
             className={classes.statsBar}
             lobbyCode={lobbyCode}
+            userId={userId}
+            userName={userName}
+            userRole={userRole}
             numUsersInLobby={numUsersInLobby}
             refreshCount={refreshCount}
             handleRefreshStatsClick={handleRefreshStatsClick}
           />
-          <Typography variant="h3">Creator Name: {currentLobby?.creator_name}</Typography>
-          <Typography variant="h4">Your user id is: {currentUser?.user_id}</Typography>
-          <Typography variant="h5">Your role is: {currentUser?.role}</Typography>
-
           <div className={classes.mazeContainer}>
             <BlockMazeDisplay mazeString={mazeString} />
           </div>
@@ -187,9 +210,13 @@ const Lobby = props => {
         </>
       ) : (
         <WorkerLobby
+          lobbyId={lobbyId}
           lobbyCode={lobbyCode}
-          currentLobby={currentLobby}
-          currentUser={currentUser}
+          // currentLobby={currentLobby}
+          // currentUser={currentUser}
+          userId={userId}
+          userName={userName}
+          userRole={userRole}
           numUsersInLobby={numUsersInLobby}
           refreshCount={refreshCount}
           handleRefreshStatsClick={handleRefreshStatsClick}
