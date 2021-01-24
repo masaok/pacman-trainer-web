@@ -2,8 +2,18 @@ import React, { useEffect, useState } from 'react'
 
 import { Helmet } from 'react-helmet-async'
 
+import { CSVLink } from 'react-csv'
+
 import { makeStyles } from '@material-ui/core/styles'
 
+import Button from '@material-ui/core/Button'
+import Paper from '@material-ui/core/Paper'
+import Table from '@material-ui/core/Table'
+import TableBody from '@material-ui/core/TableBody'
+import TableCell from '@material-ui/core/TableCell'
+import TableContainer from '@material-ui/core/TableContainer'
+import TableHead from '@material-ui/core/TableHead'
+import TableRow from '@material-ui/core/TableRow'
 import Typography from '@material-ui/core/Typography'
 
 import WorkerLobby from './WorkerLobby'
@@ -11,7 +21,12 @@ import WorkerLobby from './WorkerLobby'
 import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
 import StatsBar from '../common/StatsBar'
 
-import { getLobbyMazeByHash, getUserLobbyMazeByHash, getNumUsersInLobby } from '../../api'
+import {
+  getLobbyMazeByHash,
+  getUserLobbyMazeByHash,
+  getUserLobbyMazeByLobbyId,
+  getNumUsersInLobby,
+} from '../../api'
 
 import { MAX_RELOADS, SITE_TITLE_POSTFIX } from '../../constants'
 
@@ -38,6 +53,14 @@ const useStyles = makeStyles(
       marginTop: theme.spacing(3),
     },
 
+    // Workspace Parts
+    workspaceMiddle: {
+      display: 'flex',
+      flex: 1,
+      justifyContent: 'center',
+      marginTop: theme.spacing(3),
+    },
+
     // Controls
     controlArea: {
       display: 'flex',
@@ -51,6 +74,12 @@ const useStyles = makeStyles(
       flex: 1,
       flexDirection: 'column',
       marginTop: theme.spacing(3),
+    },
+
+    // Worker Table
+    cullSamplesLink: {
+      color: 'white',
+      textDecoration: 'none',
     },
   }),
   { name: 'Lobby' }
@@ -76,9 +105,10 @@ const Lobby = props => {
   const [numSamples, setNumSamples] = useState('')
 
   const [numUsersInLobby, setNumUsersInLobby] = useState(0)
+  const [workers, setWorkers] = useState([])
   const [refreshCount, setRefreshCount] = useState(0)
 
-  // Lobby Hash Effect (Requester)
+  // lobbyHashParam Effect (Requester)
   useEffect(() => {
     console.log('LOBBY HASH EFFECT')
 
@@ -94,6 +124,7 @@ const Lobby = props => {
           setNumSamples(maze.num_samples)
 
           // Set local values based on URL params
+          setLobbyId(maze.lobby_id)
           setLobbyCode(maze.lobby_code)
 
           setUserId(maze.creator_id)
@@ -161,17 +192,29 @@ const Lobby = props => {
       }
     }
 
+    const retrieveLobbyUsersAndActions = async () => {
+      try {
+        if (lobbyId) {
+          const usersInLobby = await getUserLobbyMazeByLobbyId(lobbyId)
+          setWorkers(usersInLobby)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    }
+
     const interval = setInterval(() => {
       setRefreshCount(refreshes => {
         if (refreshes < MAX_RELOADS) {
           console.log('REFRESH COUNT: ' + (refreshes + +1))
           retrieveNumUsersInLobby()
+          retrieveLobbyUsersAndActions()
           return refreshes + 1
         } else {
           return refreshes > MAX_RELOADS ? MAX_RELOADS : refreshes
         }
       })
-    }, 2000)
+    }, 1000)
     return () => clearInterval(interval)
   }, [lobbyCode])
 
@@ -179,6 +222,23 @@ const Lobby = props => {
   const handleRefreshStatsClick = () => {
     setRefreshCount(0)
   }
+
+  const handleMazeStringChange = mazeString => {
+    setMazeString(mazeString)
+  }
+
+  // const handleCullSamplesClick = userLobbyActions => {
+  //   console.log(userLobbyActions)
+
+  //   const data = []
+  //   for (let i = 0; i < userLobbyActions.length; i++) {
+  //     const action = userLobbyActions[i]
+  //     data.push([action.boardState, action.action])
+  //   }
+  //   console.log(data)
+
+  //   return <CSVDownload data={data} target="_blank" />
+  // }
 
   return (
     <div className={classes.root}>
@@ -190,6 +250,7 @@ const Lobby = props => {
           </Helmet>
           <StatsBar
             className={classes.statsBar}
+            lobbyId={lobbyId}
             lobbyCode={lobbyCode}
             userId={userId}
             userName={userName}
@@ -201,11 +262,66 @@ const Lobby = props => {
           <div className={classes.mazeContainer}>
             <BlockMazeDisplay mazeString={mazeString} />
           </div>
-          <div className={classes.promptContainer}>
-            <Typography>{prompt}</Typography>
+          <div className={classes.workspaceMiddle}>
+            <div className={classes.promptContainer}>
+              <Typography>
+                <strong>Prompt:</strong> {prompt}
+              </Typography>
+            </div>
           </div>
-          <div className={classes.samplesContainer}>
-            <Typography>{numSamples} samples per worker</Typography>
+          <div className={classes.workerTable}>
+            <TableContainer component={Paper}>
+              <Table className={classes.table} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Worker ID</TableCell>
+                    <TableCell>Worker Name</TableCell>
+                    <TableCell>Samples Completed</TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {workers.map((worker, index) => {
+                    const actions = worker.user_lobby_actions
+
+                    const data = []
+                    for (let i = 0; i < actions?.length; i++) {
+                      const action = actions[i]
+                      data.push([action.boardState, action.action])
+                    }
+
+                    return (
+                      <TableRow key={index}>
+                        <TableCell component="th" scope="row" align="center">
+                          {worker.user_id}
+                        </TableCell>
+                        <TableCell align="left">{worker.user_name}</TableCell>
+                        <TableCell align="center">
+                          {actions ? `${actions?.length} / ${numSamples}` : '-'}
+                        </TableCell>
+                        <TableCell align="center">
+                          <Button
+                            className={classes.cullSamplesButton}
+                            variant="contained"
+                            color="primary"
+                            size="small"
+                          >
+                            <CSVLink
+                              className={classes.cullSamplesLink}
+                              data={data}
+                              filename="samples.csv"
+                            >
+                              Cull Samples
+                            </CSVLink>
+                          </Button>
+                          {/* <CSVDownload data={data} target="_blank" label="hi" /> */}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </div>
         </>
       ) : (
@@ -223,6 +339,7 @@ const Lobby = props => {
           mazeString={mazeString}
           prompt={prompt}
           numSamples={numSamples}
+          handleMazeStringChange={handleMazeStringChange}
           // {...props}
         />
       )}

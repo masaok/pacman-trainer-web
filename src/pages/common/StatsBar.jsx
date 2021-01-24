@@ -72,6 +72,7 @@ const StatsBar = props => {
   const classes = useStyles(props)
 
   const {
+    lobbyId,
     lobbyCode,
     userId,
     userName,
@@ -84,8 +85,8 @@ const StatsBar = props => {
 
   const data = [
     {
-      field: 'Lobby',
-      value: lobbyCode,
+      field: 'Lobby (ID)',
+      value: `${lobbyCode} (${lobbyId})`,
     },
     {
       field: 'Role',
@@ -142,7 +143,7 @@ const StatsBar = props => {
             onClick={handleRefreshStatsClick}
             size="small"
           >
-            Reload Stats
+            Refresh Stats
           </Button>
         </div>
       </div>

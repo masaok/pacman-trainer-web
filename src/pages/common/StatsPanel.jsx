@@ -108,7 +108,7 @@ const StatsPanel = props => {
           onClick={handleRefreshStatsClick}
           size="small"
         >
-          Reload Stats
+          Refresh Stats
         </Button>
       </div>
     </Paper>

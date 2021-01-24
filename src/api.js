@@ -1,3 +1,6 @@
+// TODO: Use an environment variable here
+// TODO: PROD - Vercel
+// TODO: DEV - localhost:4000
 const api = 'http://localhost:4000/'
 
 const BASE_API_REQUEST_HEADER = {
@@ -49,8 +52,13 @@ const post = (resource, payload) => {
 const getLobbyById = lobbyId => get(`lobby/${lobbyId}`).then(result => result)
 const getLobbyMaze = lobbyCode => get(`lobbyMaze/${lobbyCode}`).then(result => result)
 const getLobbyMazeByHash = lobbyHash => get(`lobbyMazeByHash/${lobbyHash}`).then(result => result)
+
+// User Lobby GETs
 const getUserLobbyMazeByHash = userLobbyHash =>
   get(`userLobbyMazeByHash/${userLobbyHash}`).then(result => result)
+
+const getUserLobbyMazeByLobbyId = lobbyId =>
+  get(`userLobbyMazeByLobbyId/${lobbyId}`).then(result => result)
 
 const getNumUsersInLobby = lobbyCode =>
   get(`numUsersInLobby/${lobbyCode}`).then(result => result.count)
@@ -75,7 +83,9 @@ export {
   getLobbyById,
   getLobbyMaze,
   getLobbyMazeByHash,
+  // User Lobby GETs
   getUserLobbyMazeByHash,
+  getUserLobbyMazeByLobbyId,
   getNumUsersInLobby,
   getUserById,
   getUserCount,

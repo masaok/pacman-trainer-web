@@ -18,6 +18,7 @@ import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 
 import { SITE_TITLE_POSTFIX } from '../../constants'
+import { randomizeMazePlayers } from '../../mazes/mazeCommon'
 
 import { patchUserLobby } from '../../api'
 
@@ -121,9 +122,12 @@ const WorkerLobby = props => {
     mazeString,
     prompt,
     numSamples,
+    handleMazeStringChange,
   } = props
 
   const [actions, setActions] = useState([])
+  const [numSamplesCompleted, setNumSamplesCompleted] = useState(0)
+  const [done, setDone] = useState(false)
 
   // Actions Effect
   useEffect(() => {
@@ -136,8 +140,8 @@ const WorkerLobby = props => {
             actions,
           }
 
-          const userLobby = await patchUserLobby(userId, lobbyId, payload)
-          console.log(userLobby)
+          await patchUserLobby(userId, lobbyId, payload)
+          // console.log(userLobby)
         }
       } catch (err) {
         console.error(err)
@@ -145,6 +149,12 @@ const WorkerLobby = props => {
     }
     updateUserLobby()
   }, [actions])
+
+  // Samples Completed Effect
+  useEffect(() => {
+    console.log('SAMPLES COMPLETED EFFECT')
+    if (numSamplesCompleted > 0 && numSamplesCompleted >= numSamples) setDone(true)
+  }, [numSamplesCompleted])
 
   const handleArrowClick = (event, direction) => {
     console.log('ARROW CLICK: ' + direction)
@@ -156,6 +166,10 @@ const WorkerLobby = props => {
     const newActions = [...actions, newAction]
     console.log(newActions)
     setActions(newActions)
+
+    const newMazeString = randomizeMazePlayers(mazeString)
+    handleMazeStringChange(newMazeString)
+    setNumSamplesCompleted(numSamplesCompleted + 1)
   }
 
   return (
@@ -180,7 +194,9 @@ const WorkerLobby = props => {
           </div>
           <div className={classes.samplesContainer}>
             <Typography className={classes.samplesInfoText}>Completed:</Typography>
-            <Typography className={classes.samplesInfoText}>0 / {numSamples}</Typography>
+            <Typography className={classes.samplesInfoText}>
+              {numSamplesCompleted} / {numSamples}
+            </Typography>
           </div>
         </div>
         <div className={classes.workspaceMiddle}>
@@ -193,20 +209,36 @@ const WorkerLobby = props => {
         <div className={classes.workspaceBottom}>
           <div className={classes.arrows}>
             <div className={classes.upArrow}>
-              <IconButton className={classes.arrowButton} onClick={e => handleArrowClick(e, 'U')}>
+              <IconButton
+                className={classes.arrowButton}
+                onClick={e => handleArrowClick(e, 'U')}
+                disabled={done}
+              >
                 <KeyboardArrowUpIcon className={classes.arrowIcon} />
               </IconButton>
             </div>
             <div className={classes.sideArrows}>
-              <IconButton className={classes.arrowButton} onClick={e => handleArrowClick(e, 'L')}>
+              <IconButton
+                className={classes.arrowButton}
+                onClick={e => handleArrowClick(e, 'L')}
+                disabled={done}
+              >
                 <KeyboardArrowLeftIcon className={classes.arrowIcon} />
               </IconButton>
-              <IconButton className={classes.arrowButton} onClick={e => handleArrowClick(e, 'R')}>
+              <IconButton
+                className={classes.arrowButton}
+                onClick={e => handleArrowClick(e, 'R')}
+                disabled={done}
+              >
                 <KeyboardArrowRightIcon className={classes.arrowIcon} />
               </IconButton>
             </div>
             <div className={classes.downArrow}>
-              <IconButton className={classes.arrowButton} onClick={e => handleArrowClick(e, 'D')}>
+              <IconButton
+                className={classes.arrowButton}
+                onClick={e => handleArrowClick(e, 'D')}
+                disabled={done}
+              >
                 <KeyboardArrowDownIcon className={classes.arrowIcon} />
               </IconButton>
             </div>
