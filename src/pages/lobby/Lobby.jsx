@@ -21,6 +21,8 @@ import WorkerLobby from './WorkerLobby'
 import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
 import StatsBar from '../common/StatsBar'
 
+import { isDev } from '../../common'
+
 import {
   getLobbyMazeByHash,
   getUserLobbyMazeByHash,
@@ -28,9 +30,11 @@ import {
   getNumUsersInLobby,
 } from '../../api'
 
-import { MAX_RELOADS, SITE_TITLE_POSTFIX } from '../../constants'
+import { SITE_TITLE_POSTFIX } from '../../constants'
 
 import { panelStyles } from '../../commonStyles'
+
+const MAX_REFRESHES = 1000
 
 const useStyles = makeStyles(
   theme => ({
@@ -81,6 +85,11 @@ const useStyles = makeStyles(
       color: 'white',
       textDecoration: 'none',
     },
+
+    noWorkersText: {
+      // display: 'flex',
+      // flex: 1,
+    },
   }),
   { name: 'Lobby' }
 )
@@ -107,6 +116,10 @@ const Lobby = props => {
   const [numUsersInLobby, setNumUsersInLobby] = useState(0)
   const [workers, setWorkers] = useState([])
   const [refreshCount, setRefreshCount] = useState(0)
+  const [refreshInterval] = useState(1000)
+  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(!isDev())
+
+  const [maxRefreshes, setMaxRefreshes] = useState(isDev() ? 1 : MAX_REFRESHES)
 
   // lobbyHashParam Effect (Requester)
   useEffect(() => {
@@ -150,7 +163,7 @@ const Lobby = props => {
       try {
         // if (!lobbyHashParam) throw new Error('lobbyHashParam missing')
         if (userLobbyHashParam) {
-          console.log('USER LOBBY HASH EFFECT > lobbyHashParam: ' + lobbyHashParam)
+          console.log('USER LOBBY HASH EFFECT > lobbyHashParam: ' + userLobbyHashParam)
           const maze = await getUserLobbyMazeByHash(userLobbyHashParam)
           console.log('USER LOBBY HASH EFFECT > RETRIEVE > maze:')
           console.log(maze)
@@ -204,22 +217,26 @@ const Lobby = props => {
     }
 
     const interval = setInterval(() => {
+      // Given the current number of refreshes, update the refresh count
       setRefreshCount(refreshes => {
-        if (refreshes < MAX_RELOADS) {
+        if (refreshes < maxRefreshes) {
           console.log('REFRESH COUNT: ' + (refreshes + +1))
           retrieveNumUsersInLobby()
           retrieveLobbyUsersAndActions()
           return refreshes + 1
         } else {
-          return refreshes > MAX_RELOADS ? MAX_RELOADS : refreshes
+          // Return the max if it happens to go over, else return itself
+          setAutoRefreshEnabled(false)
+          return refreshes > maxRefreshes ? maxRefreshes : refreshes
         }
       })
-    }, 1000)
+    }, refreshInterval)
     return () => clearInterval(interval)
-  }, [lobbyCode])
+  }, [lobbyCode, refreshInterval, maxRefreshes])
 
   // Click Handlers
   const handleRefreshStatsClick = () => {
+    setMaxRefreshes(1)
     setRefreshCount(0)
   }
 
@@ -227,38 +244,43 @@ const Lobby = props => {
     setMazeString(mazeString)
   }
 
-  // const handleCullSamplesClick = userLobbyActions => {
-  //   console.log(userLobbyActions)
+  const handleSetAutoRefreshClick = () => {
+    setAutoRefreshEnabled(isEnabled => {
+      setRefreshCount(0)
+      if (isEnabled) {
+        setMaxRefreshes(1)
+        return false
+      } else {
+        setMaxRefreshes(MAX_REFRESHES)
+        return true
+      }
+    })
+  }
 
-  //   const data = []
-  //   for (let i = 0; i < userLobbyActions.length; i++) {
-  //     const action = userLobbyActions[i]
-  //     data.push([action.boardState, action.action])
-  //   }
-  //   console.log(data)
-
-  //   return <CSVDownload data={data} target="_blank" />
-  // }
+  // console.log('LOBBY BEFORE RETURN')
+  // console.log(`lobbyId: ${lobbyId}`)
 
   return (
     <div className={classes.root}>
-      {/* {currentUser?.role === 'requester' ? ( */}
+      <Helmet>
+        <title>Requester Lobby {SITE_TITLE_POSTFIX}</title>
+      </Helmet>
+      <StatsBar
+        className={classes.statsBar}
+        lobbyId={lobbyId}
+        lobbyCode={lobbyCode}
+        userId={userId}
+        userName={userName}
+        userRole={userRole}
+        numUsersInLobby={numUsersInLobby}
+        refreshCount={refreshCount}
+        maxRefreshes={maxRefreshes}
+        autoRefreshEnabled={autoRefreshEnabled}
+        handleRefreshStatsClick={handleRefreshStatsClick}
+        handleSetAutoRefreshClick={handleSetAutoRefreshClick}
+      />
       {lobbyHashParam ? (
         <>
-          <Helmet>
-            <title>Requester Lobby {SITE_TITLE_POSTFIX}</title>
-          </Helmet>
-          <StatsBar
-            className={classes.statsBar}
-            lobbyId={lobbyId}
-            lobbyCode={lobbyCode}
-            userId={userId}
-            userName={userName}
-            userRole={userRole}
-            numUsersInLobby={numUsersInLobby}
-            refreshCount={refreshCount}
-            handleRefreshStatsClick={handleRefreshStatsClick}
-          />
           <div className={classes.mazeContainer}>
             <BlockMazeDisplay mazeString={mazeString} />
           </div>
@@ -281,44 +303,52 @@ const Lobby = props => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {workers.map((worker, index) => {
-                    const actions = worker.user_lobby_actions
+                  {workers.length === 0 ? (
+                    <TableRow key={0}>
+                      <TableCell className={classes.noWorkersText} colSpan={4} align="center">
+                        No workers in this lobby yet!
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    workers.map((worker, index) => {
+                      const actions = worker.user_lobby_actions
 
-                    const data = []
-                    for (let i = 0; i < actions?.length; i++) {
-                      const action = actions[i]
-                      data.push([action.boardState, action.action])
-                    }
+                      const data = []
+                      for (let i = 0; i < actions?.length; i++) {
+                        const action = actions[i]
+                        data.push([action.boardState, action.action])
+                      }
 
-                    return (
-                      <TableRow key={index}>
-                        <TableCell component="th" scope="row" align="center">
-                          {worker.user_id}
-                        </TableCell>
-                        <TableCell align="left">{worker.user_name}</TableCell>
-                        <TableCell align="center">
-                          {actions ? `${actions?.length} / ${numSamples}` : '-'}
-                        </TableCell>
-                        <TableCell align="center">
-                          <Button
-                            className={classes.cullSamplesButton}
-                            variant="contained"
-                            color="primary"
-                            size="small"
-                          >
-                            <CSVLink
-                              className={classes.cullSamplesLink}
-                              data={data}
-                              filename="samples.csv"
+                      return (
+                        <TableRow key={index}>
+                          <TableCell component="th" scope="row" align="center">
+                            {worker.user_id}
+                          </TableCell>
+                          <TableCell align="left">{worker.user_name}</TableCell>
+                          <TableCell align="center">
+                            {actions ? `${actions?.length} / ${numSamples}` : '-'}
+                          </TableCell>
+                          <TableCell align="center">
+                            <Button
+                              className={classes.cullSamplesButton}
+                              variant="contained"
+                              color="primary"
+                              size="small"
                             >
-                              Cull Samples
-                            </CSVLink>
-                          </Button>
-                          {/* <CSVDownload data={data} target="_blank" label="hi" /> */}
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
+                              <CSVLink
+                                className={classes.cullSamplesLink}
+                                data={data}
+                                filename="samples.csv"
+                              >
+                                Cull Samples
+                              </CSVLink>
+                            </Button>
+                            {/* <CSVDownload data={data} target="_blank" label="hi" /> */}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>

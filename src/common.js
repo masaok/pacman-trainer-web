@@ -1,4 +1,4 @@
-const envIsDev = () => {
+const isDev = () => {
   return window.location.hostname === 'localhost'
 }
 
@@ -56,4 +56,4 @@ const dumpGrid = (grid, options = { header: true, stringify: true }) => {
   return result
 }
 
-export { envIsDev, dumpGrid }
+export { isDev, dumpGrid }

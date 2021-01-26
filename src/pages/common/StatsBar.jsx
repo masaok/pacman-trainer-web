@@ -7,8 +7,6 @@ import { makeStyles } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
 import Paper from '@material-ui/core/Paper'
 
-import { MAX_RELOADS } from '../../constants'
-
 import { panelStyles } from '../../commonStyles'
 
 const useStyles = makeStyles(
@@ -64,6 +62,24 @@ const useStyles = makeStyles(
     button: {
       marginLeft: theme.spacing(2),
     },
+
+    refreshStatsButton: {
+      marginRight: theme.spacing(1),
+    },
+
+    autoRefreshButtonEnabled: {
+      backgroundColor: 'lightgreen',
+      '&:hover': {
+        backgroundColor: 'lightgreen',
+      },
+    },
+
+    autoRefreshButtonDisabled: {
+      backgroundColor: 'red',
+      '&:hover': {
+        backgroundColor: 'red',
+      },
+    },
   }),
   { name: 'StatsBar' }
 )
@@ -80,7 +96,11 @@ const StatsBar = props => {
     userCount,
     numUsersInLobby,
     refreshCount,
+    maxRefreshes,
+    autoRefreshEnabled,
     handleRefreshStatsClick,
+    // handleSetRefreshInterval,
+    handleSetAutoRefreshClick,
   } = props
 
   const data = [
@@ -110,7 +130,7 @@ const StatsBar = props => {
     },
     {
       field: 'Refreshes',
-      value: `${refreshCount} / ${MAX_RELOADS}`,
+      value: `${refreshCount} / ${maxRefreshes}`,
     },
   ]
 
@@ -146,9 +166,32 @@ const StatsBar = props => {
             color="primary"
             onClick={handleRefreshStatsClick}
             size="small"
+            disabled={autoRefreshEnabled}
           >
-            Refresh Stats
+            Refresh Now
           </Button>
+          <Button
+            className={
+              autoRefreshEnabled
+                ? classes.autoRefreshButtonEnabled
+                : classes.autoRefreshButtonDisabled
+            }
+            variant="outlined"
+            color="primary"
+            onClick={handleSetAutoRefreshClick}
+            size="small"
+          >
+            Auto Refresh
+          </Button>
+          {/* <Button
+            className={classes.refreshStatsButton}
+            variant="link"
+            color="primary"
+            onClick={() => handleSetRefreshInterval(1000)}
+            size="small"
+          >
+            1 sec
+          </Button> */}
         </div>
       </div>
     </Paper>

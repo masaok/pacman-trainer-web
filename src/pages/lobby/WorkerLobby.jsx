@@ -110,20 +110,7 @@ const useStyles = makeStyles(
 const WorkerLobby = props => {
   const classes = useStyles(props)
 
-  const {
-    lobbyId,
-    lobbyCode,
-    userId,
-    userName,
-    userRole,
-    numUsersInLobby,
-    refreshCount,
-    handleRefreshStatsClick,
-    mazeString,
-    prompt,
-    numSamples,
-    handleMazeStringChange,
-  } = props
+  const { lobbyId, userId, mazeString, prompt, numSamples, handleMazeStringChange } = props
 
   const [actions, setActions] = useState([])
   const [numSamplesCompleted, setNumSamplesCompleted] = useState(0)
@@ -177,16 +164,6 @@ const WorkerLobby = props => {
       <Helmet>
         <title>Worker Lobby {SITE_TITLE_POSTFIX}</title>
       </Helmet>
-      <StatsBar
-        className={classes.statsBar}
-        lobbyCode={lobbyCode}
-        userId={userId}
-        userName={userName}
-        userRole={userRole}
-        numUsersInLobby={numUsersInLobby}
-        refreshCount={refreshCount}
-        handleRefreshStatsClick={handleRefreshStatsClick}
-      />
       <div className={classes.workspace}>
         <div className={classes.workspaceTop}>
           <div className={classes.mazeContainer}>
