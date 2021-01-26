@@ -85,6 +85,10 @@ const StatsBar = props => {
 
   const data = [
     {
+      field: 'Hostname',
+      value: window.location.hostname,
+    },
+    {
       field: 'Lobby (ID)',
       value: `${lobbyCode} (${lobbyId})`,
     },

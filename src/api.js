@@ -1,7 +1,9 @@
+import { envIsDev } from './common'
 // TODO: Use an environment variable here
 // TODO: PROD - Vercel
 // TODO: DEV - localhost:4000
-const api = 'http://localhost:4000/'
+
+const api = envIsDev() ? 'http://localhost:4000/' : 'https://pacman-trainer-api.masaok.vercel.app/'
 
 const BASE_API_REQUEST_HEADER = {
   'Content-Type': 'application/json',

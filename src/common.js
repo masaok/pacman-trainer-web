@@ -1,3 +1,7 @@
+const envIsDev = () => {
+  return window.location.hostname === 'localhost'
+}
+
 const dumpGrid = (grid, options = { header: true, stringify: true }) => {
   let result = ''
   const header = []
@@ -52,4 +56,4 @@ const dumpGrid = (grid, options = { header: true, stringify: true }) => {
   return result
 }
 
-export { dumpGrid }
+export { envIsDev, dumpGrid }
