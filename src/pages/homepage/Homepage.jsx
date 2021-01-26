@@ -181,8 +181,8 @@ const Homepage = props => {
   const history = useHistory()
 
   const [fieldValues, setFieldValues] = useState({
-    name: 'Mock Name',
-    prompt: 'Mock Prompt',
+    name: '',
+    prompt: 'Choose the move that helps Pacman eat a ghost!',
     numSamples: '10',
   })
 
@@ -247,6 +247,15 @@ const Homepage = props => {
     console.log('HOMEPAGE > HANDLE CREATE NEW LOBBY CLICK')
     console.log('HOMEPAGE > HANDLE CREATE NEW LOBBY CLICK > fieldValues:')
     console.log(fieldValues)
+
+    // Then, check for errors and return if at least one exists
+    let errorsExist = false
+    if (fieldValues.name === '') {
+      setNameFieldHelperText('Display name is required')
+      errorsExist = true
+    }
+
+    if (errorsExist) return
 
     // Create the instructor user
     const payload = {
