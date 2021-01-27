@@ -2,6 +2,8 @@ import React from 'react'
 
 import { makeStyles } from '@material-ui/core/styles'
 
+import { APP_VERSION } from '../../constants'
+
 const useStyles = makeStyles(
   theme => ({
     // Real-time Stats Panel
@@ -17,7 +19,7 @@ const useStyles = makeStyles(
 
 const Footer = props => {
   const classes = useStyles(props)
-  return <div className={classes.root}>v1.1.1</div>
+  return <div className={classes.root}>v{APP_VERSION}</div>
 }
 
 export default Footer
