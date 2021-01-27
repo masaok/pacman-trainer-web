@@ -7,6 +7,7 @@ import { CSVLink } from 'react-csv'
 import { makeStyles } from '@material-ui/core/styles'
 
 import Button from '@material-ui/core/Button'
+import CircularProgress from '@material-ui/core/CircularProgress'
 import Paper from '@material-ui/core/Paper'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
@@ -117,11 +118,15 @@ const Lobby = props => {
   const [userRole, setUserRole] = useState('')
 
   const [mazeString, setMazeString] = useState('')
+  const [mazeLoading, setMazeLoading] = useState(true)
+
   const [prompt, setPrompt] = useState('')
   const [numSamples, setNumSamples] = useState('')
 
   const [numUsersInLobby, setNumUsersInLobby] = useState(0)
   const [workers, setWorkers] = useState([])
+  const [workersLoading, setWorkersLoading] = useState(true)
+
   const [refreshCount, setRefreshCount] = useState(0)
   const [refreshInterval] = useState(1000)
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(!isDev())
@@ -156,6 +161,8 @@ const Lobby = props => {
           // Set the App Lobby and User based on the URL (allows browser reloading)
           handleLobbyIdChange(maze.lobby_id)
           handleUserIdChange(maze.creator_id)
+
+          setMazeLoading(false)
         }
       } catch (err) {
         console.error(err)
@@ -191,6 +198,8 @@ const Lobby = props => {
           // Set the App Lobby and User based on the URL (allows browser reloading)
           handleLobbyIdChange(maze.lobby_id)
           handleUserIdChange(maze.creator_id)
+
+          setMazeLoading(false)
         }
       } catch (err) {
         console.error(err)
@@ -236,6 +245,7 @@ const Lobby = props => {
           console.log(data)
 
           setWorkers(usersInLobby)
+          setWorkersLoading(false)
         }
       } catch (err) {
         console.error(err)
@@ -308,95 +318,99 @@ const Lobby = props => {
       {lobbyHashParam ? (
         <>
           <div className={classes.mazeContainer}>
-            <BlockMazeDisplay mazeString={mazeString} />
+            {mazeLoading ? <CircularProgress /> : <BlockMazeDisplay mazeString={mazeString} />}
           </div>
           <div className={classes.workspaceMiddle}>
             <div className={classes.promptContainer}>
               <Typography>
-                <strong>Prompt:</strong> {prompt}
+                <strong>Prompt shown to workers:</strong> {prompt}
               </Typography>
             </div>
           </div>
           <div className={classes.workerTable}>
-            <TableContainer component={Paper}>
-              <Table className={classes.table} aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Worker ID</TableCell>
-                    <TableCell>Worker Name</TableCell>
-                    <TableCell>Samples Completed</TableCell>
-                    <TableCell></TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {workers.length === 0 ? (
-                    <TableRow key={0}>
-                      <TableCell className={classes.noWorkersText} colSpan={4} align="center">
-                        No workers in this lobby yet!
-                      </TableCell>
+            {workersLoading ? (
+              <CircularProgress />
+            ) : (
+              <TableContainer component={Paper}>
+                <Table className={classes.table} aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Worker ID</TableCell>
+                      <TableCell>Worker Name</TableCell>
+                      <TableCell>Samples Completed</TableCell>
+                      <TableCell></TableCell>
                     </TableRow>
-                  ) : (
-                    workers.map((worker, index) => {
-                      const actions = worker.user_lobby_actions
+                  </TableHead>
+                  <TableBody>
+                    {workers.length === 0 ? (
+                      <TableRow key={0}>
+                        <TableCell className={classes.noWorkersText} colSpan={4} align="center">
+                          No workers in this lobby yet!
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      workers.map((worker, index) => {
+                        const actions = worker.user_lobby_actions
 
-                      const data = []
-                      for (let i = 0; i < actions?.length; i++) {
-                        const action = actions[i]
-                        data.push([action.boardState, action.action])
-                      }
+                        const data = []
+                        for (let i = 0; i < actions?.length; i++) {
+                          const action = actions[i]
+                          data.push([action.boardState, action.action])
+                        }
 
-                      return (
-                        <TableRow key={index}>
-                          <TableCell component="th" scope="row" align="center">
-                            {worker.user_id}
-                          </TableCell>
-                          <TableCell align="left">{worker.user_name}</TableCell>
-                          <TableCell align="center">
-                            {actions ? `${actions?.length} / ${numSamples}` : '-'}
-                          </TableCell>
-                          <TableCell align="center">
-                            <Button
-                              className={classes.cullSamplesButton}
-                              variant="contained"
-                              color="primary"
-                              size="small"
-                            >
-                              <CSVLink
-                                className={classes.cullSamplesLink}
-                                data={data}
-                                filename={`samples_${worker.user_id}.csv`}
+                        return (
+                          <TableRow key={index}>
+                            <TableCell component="th" scope="row" align="center">
+                              {worker.user_id}
+                            </TableCell>
+                            <TableCell align="left">{worker.user_name}</TableCell>
+                            <TableCell align="center">
+                              {actions ? `${actions?.length} / ${numSamples}` : '-'}
+                            </TableCell>
+                            <TableCell align="center">
+                              <Button
+                                className={classes.cullSamplesButton}
+                                variant="contained"
+                                color="primary"
+                                size="small"
                               >
-                                Cull Samples
-                              </CSVLink>
-                            </Button>
-                            {/* <CSVDownload data={data} target="_blank" label="hi" /> */}
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })
-                  )}
-                  {workers.length > 0 && (
-                    <TableRow key="cull all samples">
-                      <TableCell scope="row" align="center" colSpan={4}>
-                        <Button
-                          className={classes.cullSamplesButton}
-                          variant="contained"
-                          color="primary"
-                        >
-                          <CSVLink
-                            className={classes.cullAllSamplesLink}
-                            data={sampleData}
-                            filename={`all_sample_data_${lobbyCode}_${lobbyId}.csv`}
+                                <CSVLink
+                                  className={classes.cullSamplesLink}
+                                  data={data}
+                                  filename={`samples_${worker.user_id}.csv`}
+                                >
+                                  Cull Samples
+                                </CSVLink>
+                              </Button>
+                              {/* <CSVDownload data={data} target="_blank" label="hi" /> */}
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })
+                    )}
+                    {workers.length > 0 && (
+                      <TableRow key="cull all samples">
+                        <TableCell scope="row" align="center" colSpan={4}>
+                          <Button
+                            className={classes.cullSamplesButton}
+                            variant="contained"
+                            color="primary"
                           >
-                            Cull All Samples
-                          </CSVLink>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                            <CSVLink
+                              className={classes.cullAllSamplesLink}
+                              data={sampleData}
+                              filename={`all_sample_data_${lobbyCode}_${lobbyId}.csv`}
+                            >
+                              Cull All Samples
+                            </CSVLink>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
           </div>
         </>
       ) : (
@@ -412,6 +426,7 @@ const Lobby = props => {
           refreshCount={refreshCount}
           handleRefreshStatsClick={handleRefreshStatsClick}
           mazeString={mazeString}
+          mazeLoading={mazeLoading}
           prompt={prompt}
           numSamples={numSamples}
           handleMazeStringChange={handleMazeStringChange}

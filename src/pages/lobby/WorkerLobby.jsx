@@ -6,16 +6,15 @@ import { Helmet } from 'react-helmet-async'
 
 import { makeStyles } from '@material-ui/core/styles'
 
+import CircularProgress from '@material-ui/core/CircularProgress'
 import IconButton from '@material-ui/core/IconButton'
-import Typography from '@material-ui/core/Typography'
-
-import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
-import StatsBar from '../common/StatsBar'
-
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft'
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
+import Typography from '@material-ui/core/Typography'
+
+import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
 
 import { SITE_TITLE_POSTFIX } from '../../constants'
 import { randomizeMazePlayers } from '../../mazes/mazeCommon'
@@ -110,7 +109,15 @@ const useStyles = makeStyles(
 const WorkerLobby = props => {
   const classes = useStyles(props)
 
-  const { lobbyId, userId, mazeString, prompt, numSamples, handleMazeStringChange } = props
+  const {
+    lobbyId,
+    userId,
+    mazeString,
+    mazeLoading,
+    prompt,
+    numSamples,
+    handleMazeStringChange,
+  } = props
 
   const [actions, setActions] = useState([])
   const [numSamplesCompleted, setNumSamplesCompleted] = useState(0)
@@ -167,7 +174,7 @@ const WorkerLobby = props => {
       <div className={classes.workspace}>
         <div className={classes.workspaceTop}>
           <div className={classes.mazeContainer}>
-            <BlockMazeDisplay mazeString={mazeString} />
+            {mazeLoading ? <CircularProgress /> : <BlockMazeDisplay mazeString={mazeString} />}
           </div>
           <div className={classes.samplesContainer}>
             <Typography className={classes.samplesInfoText}>Completed:</Typography>

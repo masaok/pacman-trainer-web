@@ -142,7 +142,7 @@ const StatsBar = props => {
             className={classes.homeButton}
             component={Link}
             to="/"
-            variant="outlined"
+            variant="contained"
             color="primary"
             size="small"
           >
