@@ -79,15 +79,13 @@ const StatsPanel = props => {
 
   return (
     <Paper className={classes.realTimeStatsPanel}>
-      <Typography className={classes.panelTitle}>Real-time Stats</Typography>
+      <Typography className={classes.panelTitle}>Stats</Typography>
       <div className={classes.panelInnerContainer}>
         <TableContainer className={classes.tableContainer} component={Paper}>
           <Table className={classes.table} aria-label="simple table">
             <TableBody>
               {data.map((item, index) => {
-                return item.value === undefined ? (
-                  ''
-                ) : (
+                return item.value === undefined ? null : (
                   <TableRow key={index}>
                     <TableCell classes={{ root: classes.cellRoot }} size="small">
                       {item.field}

@@ -1,4 +1,4 @@
-const APP_TITLE = 'Pacman Trainer'
+const APP_TITLE = 'Pacman Imitation Learning Tool'
 const SITE_TITLE_POSTFIX = `| ${APP_TITLE}`
 
 const MAX_RELOADS = 5

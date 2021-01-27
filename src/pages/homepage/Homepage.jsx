@@ -9,6 +9,8 @@ import { useHistory } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles'
 
 import Button from '@material-ui/core/Button'
+import Card from '@material-ui/core/Card'
+import CardMedia from '@material-ui/core/CardMedia'
 import Paper from '@material-ui/core/Paper'
 import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
@@ -34,6 +36,8 @@ import { dumpGrid } from '../../common'
 
 import { panelStyles } from '../../commonStyles'
 
+import pacmanImitationLogoNarrow from '../../assets/images/pacman_imitation_narrow_margin.png'
+
 const useStyles = makeStyles(
   theme => ({
     ...panelStyles(theme),
@@ -48,8 +52,28 @@ const useStyles = makeStyles(
     },
 
     pageTitle: {
+      color: 'white',
+      fontSize: 40,
+      fontFamily: ['Carter One', 'sans-serif'].join(','),
+      textShadow: '3px 3px 4px #000',
       marginTop: theme.spacing(2),
       marginBottom: theme.spacing(2),
+    },
+
+    logoPaper: {
+      // // backgroundImage: `url(${pacmanImitationLogoNarrow})`,
+      // width: 200,
+      // height: 200,
+    },
+
+    logoImage: {
+      width: '100%',
+      height: 'auto',
+    },
+
+    media: {
+      height: 0,
+      paddingTop: '50%',
     },
 
     // Panel Containers
@@ -139,6 +163,11 @@ const useStyles = makeStyles(
       marginTop: theme.spacing(3),
     },
 
+    homepageActionButton: {
+      marginTop: theme.spacing(1),
+      fontSize: 20,
+    },
+
     // Controls
     mazeControlArea: {
       display: 'flex',
@@ -152,12 +181,12 @@ const useStyles = makeStyles(
       display: 'flex',
     },
 
-    field: {
-      margin: theme.spacing(1),
+    lobbyCodeField: {
+      marginTop: theme.spacing(2),
     },
 
     numSamplesField: {
-      maxWidth: 140,
+      maxWidth: 150,
     },
 
     createLobbyPanel: {
@@ -168,6 +197,14 @@ const useStyles = makeStyles(
       marginTop: theme.spacing(2),
       marginBottom: theme.spacing(3),
       padding: theme.spacing(3),
+    },
+
+    requesterNameField: {
+      marginRight: theme.spacing(2),
+    },
+
+    promptField: {
+      marginRight: theme.spacing(2),
     },
   }),
   { name: 'Homepage' }
@@ -182,6 +219,7 @@ const Homepage = props => {
 
   const [fieldValues, setFieldValues] = useState({
     name: '',
+    requesterName: '',
     prompt: 'Choose the move that helps Pacman eat a ghost!',
     numSamples: '10',
   })
@@ -192,6 +230,7 @@ const Homepage = props => {
   // Validation
   // const [nameFieldError, setNameFieldError] = useState(false)
   const [nameFieldHelperText, setNameFieldHelperText] = useState('')
+  const [requesterNameFieldHelperText, setRequesterNameFieldHelperText] = useState('')
   // const [lobbyFieldError, setLobbyFieldError] = useState(false)
   const [lobbyFieldHelperText, setLobbyFieldHelperText] = useState('')
 
@@ -248,10 +287,11 @@ const Homepage = props => {
     console.log('HOMEPAGE > HANDLE CREATE NEW LOBBY CLICK > fieldValues:')
     console.log(fieldValues)
 
-    // Then, check for errors and return if at least one exists
+    // Then, check for errors and return on any error
+    // try/catch only allows for a single error
     let errorsExist = false
-    if (fieldValues.name === '') {
-      setNameFieldHelperText('Display name is required')
+    if (fieldValues.requesterName === '') {
+      setRequesterNameFieldHelperText('Requester name is required')
       errorsExist = true
     }
 
@@ -259,7 +299,7 @@ const Homepage = props => {
 
     // Create the instructor user
     const payload = {
-      name: fieldValues?.name,
+      name: fieldValues?.requesterName,
       role: 'requester',
     }
 
@@ -306,7 +346,8 @@ const Homepage = props => {
     setNameFieldHelperText('')
     setLobbyFieldHelperText('')
 
-    // Then, check for errors and return if at least one exists
+    // Then, check for errors and return on any error
+    // try/catch only allows for a single error
     let errorsExist = false
     if (fieldValues.name === '') {
       setNameFieldHelperText('Display name is required')
@@ -391,18 +432,23 @@ const Homepage = props => {
     <div className={classes.root}>
       <Helmet>
         <title>{APP_TITLE}</title>
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Carter+One&amp;display=swap"
+          rel="stylesheet"
+        ></link>
       </Helmet>
       <Typography variant="h2" className={classes.pageTitle}>
         {APP_TITLE}
       </Typography>
 
       <div className={classes.topPanels}>
-        {/* Name Panel */}
-        <Paper className={classes.namePanel}>
-          <Typography className={classes.panelTitle}>Worker Name</Typography>
+        {/* Join Lobby Panel */}
+        <Paper className={classes.joinLobbyPanel}>
+          <Typography className={classes.panelTitle}>Join a Lobby</Typography>
           <TextField
             className={clsx(classes.field, classes.nameField)}
-            label="Type your display name"
+            label="Worker name"
             helperText={nameFieldHelperText}
             variant="outlined"
             size="small"
@@ -411,14 +457,9 @@ const Homepage = props => {
             onChange={handleFieldChange}
             error={Boolean(nameFieldHelperText)}
           />
-        </Paper>
-
-        {/* Join Lobby Panel */}
-        <Paper className={classes.joinLobbyPanel}>
-          <Typography className={classes.panelTitle}>Join a Lobby</Typography>
           <div className={classes.panelInnerContainer}>
             <TextField
-              className={clsx(classes.field, classes.nameField)}
+              className={clsx(classes.field, classes.lobbyCodeField)}
               label="Enter lobby code here"
               helperText={lobbyFieldHelperText}
               variant="outlined"
@@ -431,7 +472,7 @@ const Homepage = props => {
             />
             <div className={classes.joinLobbyButtonContainer}>
               <Button
-                className={classes.joinLobbyButton}
+                className={classes.homepageActionButton}
                 variant="contained"
                 color="primary"
                 onClick={handleJoinLobbyClick}
@@ -444,16 +485,18 @@ const Homepage = props => {
         </Paper>
 
         {/* Real Time Stats Panel */}
-        <StatsPanel
-          userCount={userCount}
-          refreshCount={refreshCount}
-          handleRefreshStatsClick={handleRefreshStatsClick}
-        />
+        <div>
+          <StatsPanel
+            userCount={userCount}
+            refreshCount={refreshCount}
+            handleRefreshStatsClick={handleRefreshStatsClick}
+          />
+        </div>
       </div>
 
       {/* Create Lobby Panel */}
       <Paper className={classes.createLobbyPanel}>
-        <Typography className={classes.panelTitle}>Create a Lobby</Typography>
+        <Typography className={classes.panelTitle}>Lobby Creation Panel</Typography>
         <div className={classes.panelInnerContainer}>
           <Paper className={classes.mazeGenerationPanel}>
             <div className={classes.mazeArea}>
@@ -487,6 +530,17 @@ const Homepage = props => {
 
           <div className={classes.formFields}>
             <TextField
+              className={clsx(classes.field, classes.requesterNameField)}
+              label="Requester Name"
+              helperText={requesterNameFieldHelperText}
+              variant="outlined"
+              size="small"
+              name="requesterName"
+              value={fieldValues.requesterName}
+              onChange={handleFieldChange}
+              error={Boolean(requesterNameFieldHelperText)}
+            />
+            <TextField
               className={clsx(classes.field, classes.promptField)}
               label="Worker Prompt"
               helperText="Instructions for your workers to follow"
@@ -513,10 +567,11 @@ const Homepage = props => {
           </div>
           <div className={classes.createLobbyButtonContainer}>
             <Button
-              className={classes.button}
+              className={classes.homepageActionButton}
               variant="contained"
               color="primary"
               onClick={handleCreateNewLobbyClick}
+              size="large"
             >
               Create New Lobby
             </Button>

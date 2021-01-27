@@ -63,6 +63,7 @@ const useStyles = makeStyles(
       flex: 1,
       justifyContent: 'center',
       marginTop: theme.spacing(3),
+      marginBottom: theme.spacing(3),
     },
 
     // Controls
@@ -84,6 +85,12 @@ const useStyles = makeStyles(
     cullSamplesLink: {
       color: 'white',
       textDecoration: 'none',
+    },
+
+    cullAllSamplesLink: {
+      color: 'white',
+      textDecoration: 'none',
+      fontSize: 15,
     },
 
     noWorkersText: {
@@ -120,6 +127,8 @@ const Lobby = props => {
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(!isDev())
 
   const [maxRefreshes, setMaxRefreshes] = useState(isDev() ? 1 : MAX_REFRESHES)
+
+  const [sampleData, setSampleData] = useState([])
 
   // lobbyHashParam Effect (Requester)
   useEffect(() => {
@@ -209,6 +218,23 @@ const Lobby = props => {
       try {
         if (lobbyId) {
           const usersInLobby = await getUserLobbyMazeByLobbyId(lobbyId)
+
+          // Aggregate ALL samples
+          const data = []
+          for (let i = 0; i < usersInLobby.length; i++) {
+            const worker = usersInLobby[i]
+            console.log(worker)
+
+            const actions = worker.user_lobby_actions
+
+            for (let i = 0; i < actions?.length; i++) {
+              const action = actions[i]
+              data.push([action.boardState, action.action])
+            }
+          }
+          setSampleData(data)
+          console.log(data)
+
           setWorkers(usersInLobby)
         }
       } catch (err) {
@@ -338,7 +364,7 @@ const Lobby = props => {
                               <CSVLink
                                 className={classes.cullSamplesLink}
                                 data={data}
-                                filename="samples.csv"
+                                filename={`samples_${worker.user_id}.csv`}
                               >
                                 Cull Samples
                               </CSVLink>
@@ -348,6 +374,25 @@ const Lobby = props => {
                         </TableRow>
                       )
                     })
+                  )}
+                  {workers.length > 0 && (
+                    <TableRow key="cull all samples">
+                      <TableCell scope="row" align="center" colSpan={4}>
+                        <Button
+                          className={classes.cullSamplesButton}
+                          variant="contained"
+                          color="primary"
+                        >
+                          <CSVLink
+                            className={classes.cullAllSamplesLink}
+                            data={sampleData}
+                            filename={`all_sample_data_${lobbyCode}_${lobbyId}.csv`}
+                          >
+                            Cull All Samples
+                          </CSVLink>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
                   )}
                 </TableBody>
               </Table>

@@ -181,7 +181,7 @@ const StatsBar = props => {
             onClick={handleSetAutoRefreshClick}
             size="small"
           >
-            Auto Refresh
+            Auto Refresh {autoRefreshEnabled ? 'On' : 'Off'}
           </Button>
           {/* <Button
             className={classes.refreshStatsButton}

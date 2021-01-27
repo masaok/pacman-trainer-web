@@ -1,7 +1,7 @@
 const panelStyles = theme => ({
   panelTitle: {
     fontWeight: 'bold',
-    fontSize: 22,
+    fontSize: 18,
     marginBottom: theme.spacing(2),
   },
 
