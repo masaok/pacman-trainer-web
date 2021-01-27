@@ -18,7 +18,7 @@ import { getLobbyById, getUserById } from './api'
 const useStyles = makeStyles(
   theme => ({
     app: {
-      width: '100vw',
+      // width: '100vw',
       height: '100vh',
       padding: 0,
       margin: 0,

@@ -44,9 +44,8 @@ const useStyles = makeStyles(
       flex: 1,
       flexDirection: 'column',
       alignItems: 'center',
-      // backgroundColor: theme.palette.grey[200],
       // backgroundColor: theme.palette.primary.light,
-      backgroundColor: '#7986CB',
+      backgroundColor: '#7986CB', // light doesn't match for some reason
     },
 
     pageTitle: {
