@@ -39,7 +39,7 @@ const randomizeMazePlayers = mazeString => {
   return newString
 }
 
-// TODO: Given a mazeString, convert into a 2D array
+// Given a mazeString, convert into a 2D array
 const mazeStringToArray = mazeString => {
   const result = []
   const rowStrings = mazeString.trim().split('\n')
@@ -50,10 +50,9 @@ const mazeStringToArray = mazeString => {
   return result
 }
 
-// TODO: Given a 2D array maze, randomize the placement of pacman, ghosts, and pellets
+// Given a 2D array maze, randomize the placement of pacman, ghosts, and pellets
 const randomizeMazeArrayPlayers = mazeArray => {
   // Pick and count all non-X non-dot characters
-
   const counter = {}
 
   for (let i = 0; i < mazeArray.length; i++) {
@@ -119,7 +118,7 @@ const randomizeMazeArrayPlayers = mazeArray => {
   return mazeArray
 }
 
-// TODO: Given a 2D array maze, convert into a mazeString
+// Given a 2D array maze, convert into a mazeString
 const mazeArrayToString = mazeArray => {
   const strings = []
   for (let i = 0; i < mazeArray.length; i++) {

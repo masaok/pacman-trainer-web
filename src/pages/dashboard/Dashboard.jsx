@@ -6,9 +6,7 @@ import clsx from 'clsx'
 
 import { makeStyles } from '@material-ui/core/styles'
 
-import { Avatar, Button, IconButton } from '@material-ui/core'
-
-import AppsIcon from '@material-ui/icons/Apps'
+import Button from '@material-ui/core/Button'
 
 import TaskDisplay from './content/TaskDisplay'
 

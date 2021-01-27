@@ -23,6 +23,7 @@ const useStyles = makeStyles(
       padding: 0,
       margin: 0,
       backgroundColor: theme.palette.common.white, // switch to black for debugging
+      // backgroundColor: theme.palette.primary.light, // switch to black for debugging
     },
   }),
   { name: 'App' }
@@ -31,7 +32,6 @@ const useStyles = makeStyles(
 const App = props => {
   const classes = useStyles(props)
 
-  // TODO: These should be updated by fetching the object based on an ID
   const [currentLobbyId, setCurrentLobbyId] = useState(null)
   const [currentUserId, setCurrentUserId] = useState(null)
 
@@ -81,6 +81,11 @@ const App = props => {
             href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
             rel="stylesheet"
           />
+          <link rel="preconnect" href="https://fonts.gstatic.com" />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Carter+One&amp;display=swap"
+            rel="stylesheet"
+          ></link>
         </Helmet>
         <ThemeProvider theme={theme}>
           {/* Global CSS reset: https://material-ui.com/components/css-baseline/ */}

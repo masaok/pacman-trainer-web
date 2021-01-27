@@ -17,13 +17,6 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Typography from '@material-ui/core/Typography'
 
-import WorkerLobby from './WorkerLobby'
-
-import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
-import StatsBar from '../common/StatsBar'
-
-import { isDev } from '../../common'
-
 import {
   getLobbyMazeByHash,
   getUserLobbyMazeByHash,
@@ -31,9 +24,14 @@ import {
   getNumUsersInLobby,
 } from '../../api'
 
+import { isDev } from '../../common'
+import { panelStyles } from '../../commonStyles'
 import { SITE_TITLE_POSTFIX } from '../../constants'
 
-import { panelStyles } from '../../commonStyles'
+import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
+import Footer from '../common/Footer'
+import StatsBar from '../common/StatsBar'
+import WorkerLobby from './WorkerLobby'
 
 const MAX_REFRESHES = 1000
 
@@ -413,6 +411,7 @@ const Lobby = props => {
           // {...props}
         />
       )}
+      <Footer />
     </div>
   )
 }

@@ -14,6 +14,7 @@ module.exports = {
   },
   plugins: ['react', 'react-with-styles'],
   rules: {
+    'no-constant-condition': 0, // allow while (true)
     'no-undef': 0,
 
     // Prop Types warnings (this works instantly if you change it to 1)

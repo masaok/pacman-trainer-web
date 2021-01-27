@@ -23,16 +23,17 @@ import {
   postUserLobby,
 } from '../../api'
 
-// import RandomMaze from './RandomMaze'
-import { generateMazeGrid } from '../../mazes/RecursiveBacktrackingMaze'
-import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
-import StatsPanel from '../common/StatsPanel'
-
 import { APP_TITLE, MAX_RELOADS } from '../../constants'
 
 import { dumpGrid } from '../../common'
 
 import { panelStyles } from '../../commonStyles'
+
+// import RandomMaze from './RandomMaze'
+import { generateMazeGrid } from '../../mazes/RecursiveBacktrackingMaze'
+import BlockMazeDisplay from '../../mazes/views/BlockMazeDisplay'
+import StatsPanel from '../common/StatsPanel'
+import Footer from '../common/Footer'
 
 const useStyles = makeStyles(
   theme => ({
@@ -44,7 +45,8 @@ const useStyles = makeStyles(
       flexDirection: 'column',
       alignItems: 'center',
       // backgroundColor: theme.palette.grey[200],
-      backgroundColor: theme.palette.primary.light,
+      // backgroundColor: theme.palette.primary.light,
+      backgroundColor: '#7986CB',
     },
 
     pageTitle: {
@@ -397,11 +399,6 @@ const Homepage = props => {
     <div className={classes.root}>
       <Helmet>
         <title>{APP_TITLE}</title>
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Carter+One&amp;display=swap"
-          rel="stylesheet"
-        ></link>
       </Helmet>
       <Typography variant="h2" className={classes.pageTitle}>
         {APP_TITLE}
@@ -543,6 +540,7 @@ const Homepage = props => {
           </div>
         </div>
       </Paper>
+      <Footer />
     </div>
   )
 }
