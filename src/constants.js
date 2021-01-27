@@ -1,5 +1,5 @@
 const APP_TITLE = 'Pacman Imitation Learning Tool'
-const APP_VERSION = '1.1.2'
+const APP_VERSION = '1.1.3'
 
 const SITE_TITLE_POSTFIX = `| ${APP_TITLE}`
 

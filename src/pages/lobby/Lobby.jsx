@@ -355,7 +355,7 @@ const Lobby = props => {
                                 <CSVLink
                                   className={classes.cullSamplesLink}
                                   data={data}
-                                  filename={`samples_${worker.user_id}.csv`}
+                                  filename={`samples_from_worker_${worker.user_id}.csv`}
                                 >
                                   Cull Samples
                                 </CSVLink>
@@ -366,7 +366,7 @@ const Lobby = props => {
                         )
                       })
                     )}
-                    {workers.length > 0 && (
+                    {workers.length >= 2 && (
                       <TableRow key="cull all samples">
                         <TableCell scope="row" align="center" colSpan={4}>
                           <Button
@@ -377,7 +377,7 @@ const Lobby = props => {
                             <CSVLink
                               className={classes.cullAllSamplesLink}
                               data={sampleData}
-                              filename={`all_sample_data_${lobbyCode}_${lobbyId}.csv`}
+                              filename={`sample_from_all_workers_in_lobby_${lobbyCode}_${lobbyId}.csv`}
                             >
                               Cull All Samples
                             </CSVLink>
