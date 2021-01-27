@@ -9,8 +9,6 @@ import { useHistory } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles'
 
 import Button from '@material-ui/core/Button'
-import Card from '@material-ui/core/Card'
-import CardMedia from '@material-ui/core/CardMedia'
 import Paper from '@material-ui/core/Paper'
 import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
@@ -35,8 +33,6 @@ import { APP_TITLE, MAX_RELOADS } from '../../constants'
 import { dumpGrid } from '../../common'
 
 import { panelStyles } from '../../commonStyles'
-
-import pacmanImitationLogoNarrow from '../../assets/images/pacman_imitation_narrow_margin.png'
 
 const useStyles = makeStyles(
   theme => ({
@@ -246,13 +242,9 @@ const Homepage = props => {
   }, [])
 
   useEffect(() => {
-    console.log('HOMEPAGE > USER COUNT EFFECT')
-
     const retrieveUserCount = async () => {
       try {
         const count = await getUserCount()
-        // console.log('HOMEPAGE > USER COUNT EFFECT > userCount:')
-        // console.log(count)
         setUserCount(count)
       } catch (err) {
         console.error(err)
@@ -262,7 +254,6 @@ const Homepage = props => {
     const interval = setInterval(() => {
       setRefreshCount(refreshes => {
         if (refreshes < MAX_RELOADS) {
-          console.log('REFRESH COUNT: ' + (refreshes + +1))
           retrieveUserCount()
           return refreshes + 1
         } else {
@@ -283,12 +274,8 @@ const Homepage = props => {
 
   // Create New Lobby Handler
   const handleCreateNewLobbyClick = async () => {
-    console.log('HOMEPAGE > HANDLE CREATE NEW LOBBY CLICK')
-    console.log('HOMEPAGE > HANDLE CREATE NEW LOBBY CLICK > fieldValues:')
-    console.log(fieldValues)
-
-    // Then, check for errors and return on any error
-    // try/catch only allows for a single error
+    // Check for errors and return on any error
+    // (try/catch only allows for a single error)
     let errorsExist = false
     if (fieldValues.requesterName === '') {
       setRequesterNameFieldHelperText('Requester name is required')
@@ -304,18 +291,13 @@ const Homepage = props => {
     }
 
     const user = await postUser(payload)
-    console.log('POST USER > user:')
-    console.log(user)
     if (!user) throw new Error('user creation failed')
 
-    console.log('CALLING HANDLE USER CHANGE: ' + user.user_id)
     handleUserIdChange(user.user_id) // pass to parent
 
     const maze = await postMaze({
       string: mazeString,
     })
-    console.log('POST MAZE > maze:')
-    console.log(maze)
     if (!maze) throw new Error('maze creation failed')
 
     const lobby = await postLobby({
@@ -325,15 +307,11 @@ const Homepage = props => {
     })
     if (!lobby) throw new Error('lobby creation failed')
     handleLobbyIdChange(lobby.lobby_id) // pass to parent
-    console.log('POST LOBBY > lobby:')
-    console.log(lobby)
 
-    const lobbyMaze = await postLobbyMaze({
+    await postLobbyMaze({
       lobbyId: lobby.lobby_id,
       mazeId: maze.maze_id,
     })
-    console.log('POST LOBBY MAZE > lobbyMaze:')
-    console.log(lobbyMaze)
 
     // Redirect to the lobby
     // history.push(`/${lobby?.code}`) // API generates the lobby code
@@ -363,8 +341,6 @@ const Homepage = props => {
 
     // Fetch the Lobby by the code
     const lobbyMaze = await getLobbyMaze(lobbyCode)
-    console.log('HANDLE JOIN LOBBY CLICK > lobbyMaze:')
-    console.log(lobbyMaze)
     if (!lobbyMaze) throw new Error('lobbyMaze fetch failed')
     handleLobbyIdChange(lobbyMaze.lobby_id)
 
@@ -376,8 +352,6 @@ const Homepage = props => {
 
     // Insert the new User by name
     const user = await postUser(payload)
-    console.log('HANDLE JOIN LOBBY CLICK > user:')
-    console.log(user)
     if (!user) throw new Error('user creation failed')
     handleUserIdChange(user.user_id)
 
@@ -387,17 +361,10 @@ const Homepage = props => {
       lobbyId: lobbyMaze.lobby_id,
     })
     if (!userLobby) throw new Error('userLobby creation failed')
-    console.log('HANDLE JOIN LOBBY CLICK > userLobby:')
-    console.log(userLobby)
     if (!user) throw new Error('userLobby row creation failed')
 
     // Redirect the User to the Lobby and display the maze and prompt
-    // console.log('HANDLE JOIN LOBBY CLICK > REDIRECT to lobby:')
-    // console.log(lobbyMaze.lobby_code)
-    // history.push(`/${lobbyMaze?.lobby_code}`)
-
     const redirectPath = `/w/${userLobby?.hash}`
-    console.log('HOMEPAGE > REDIRECT TO: ' + redirectPath)
     history.push(redirectPath)
   }
 
@@ -423,8 +390,6 @@ const Homepage = props => {
 
   // Text Maze Handlers
   const handleTextMazeChange = event => {
-    console.log('HANDLE TEXT MAZE CHANGE > event:')
-    console.log(event.target.value)
     setMazeString(event.target.value)
   }
 

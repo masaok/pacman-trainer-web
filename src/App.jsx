@@ -40,13 +40,9 @@ const App = props => {
 
   // Current Lobby ID Effect
   useEffect(() => {
-    console.log('APP > LOBBY ID EFFECT')
-
     const retrieveLobby = async () => {
       try {
         const lobby = await getLobbyById(currentLobbyId)
-        console.log('APP > EFFECT > lobby:')
-        console.log(lobby)
         setCurrentLobby(lobby)
       } catch (err) {
         console.error(err)
@@ -57,13 +53,9 @@ const App = props => {
 
   // Current User ID Effect
   useEffect(() => {
-    console.log('APP > USER ID EFFECT')
-
     const retrieveUser = async () => {
       try {
         const user = await getUserById(currentUserId)
-        console.log('APP > EFFECT > user:')
-        console.log(user)
         setCurrentUser(user)
       } catch (err) {
         console.error(err)

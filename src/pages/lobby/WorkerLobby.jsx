@@ -125,8 +125,6 @@ const WorkerLobby = props => {
 
   // Actions Effect
   useEffect(() => {
-    console.log('WORK LOBBY > ACTIONS EFFECT')
-
     const updateUserLobby = async () => {
       try {
         if (userId && lobbyId) {
@@ -135,7 +133,6 @@ const WorkerLobby = props => {
           }
 
           await patchUserLobby(userId, lobbyId, payload)
-          // console.log(userLobby)
         }
       } catch (err) {
         console.error(err)
@@ -146,19 +143,16 @@ const WorkerLobby = props => {
 
   // Samples Completed Effect
   useEffect(() => {
-    console.log('SAMPLES COMPLETED EFFECT')
     if (numSamplesCompleted > 0 && numSamplesCompleted >= numSamples) setDone(true)
   }, [numSamplesCompleted])
 
   const handleArrowClick = (event, direction) => {
-    console.log('ARROW CLICK: ' + direction)
     const newAction = {
       boardState: mazeString,
       action: direction,
     }
 
     const newActions = [...actions, newAction]
-    console.log(newActions)
     setActions(newActions)
 
     const newMazeString = randomizeMazePlayers(mazeString)

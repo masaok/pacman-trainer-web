@@ -79,7 +79,6 @@ const RandomMaze = props => {
   const [maze, setMaze] = useState(mockMaze)
 
   useEffect(() => {
-    console.log('RANDOM MAZE > FIRST LOAD EFFECT')
     generateNewMaze()
   }, [seed])
 

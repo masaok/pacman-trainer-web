@@ -122,7 +122,6 @@ const Dashboard = props => {
 
   // First load effect
   useEffect(() => {
-    console.log('DASHBOARD > match.path: ' + match.path)
     switch (match.path) {
       default:
         // setContent(TaskDisplay)

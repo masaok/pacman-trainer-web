@@ -311,10 +311,8 @@ const RecursiveBacktrackingMaze = props => {
   const [maze, setMaze] = useState([])
 
   useEffect(() => {
-    console.log('RECURSIVE MAZE > FIRST LOAD EFFECT')
     const grid = generateMazeGrid()
     setMaze(grid)
-    // setMaze(carved)
   }, [seed])
 
   useEffect(() => {

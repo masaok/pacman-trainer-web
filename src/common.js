@@ -6,13 +6,6 @@ const dumpGrid = (grid, options = { header: true, stringify: true }) => {
   let result = ''
   const header = []
 
-  // console.log('HELPERS > DUMP GRID > grid:')
-  // console.log(grid)
-  // console.log(typeof grid)
-
-  // console.log('HELPERS > DUMP GRID > options:')
-  // console.log(options)
-
   if (typeof grid === 'object' && grid.length > 0) {
     for (let i = 0; i < grid[0].length; i++) {
       header.push(i.toString())

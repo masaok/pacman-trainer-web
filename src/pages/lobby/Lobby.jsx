@@ -137,15 +137,10 @@ const Lobby = props => {
 
   // lobbyHashParam Effect (Requester)
   useEffect(() => {
-    console.log('LOBBY HASH EFFECT')
-
     const retrieveLobbyMaze = async () => {
       try {
         if (lobbyHashParam) {
-          console.log('LOBBY HASH EFFECT > lobbyHashParam: ' + lobbyHashParam)
           const maze = await getLobbyMazeByHash(lobbyHashParam)
-          console.log('LOBBY HASH EFFECT > RETRIEVE > maze:')
-          console.log(maze)
           setMazeString(maze.maze_string)
           setPrompt(maze.lobby_prompt)
           setNumSamples(maze.num_samples)
@@ -173,16 +168,11 @@ const Lobby = props => {
 
   // User Lobby Hash Effect (Worker)
   useEffect(() => {
-    console.log('USER LOBBY HASH EFFECT')
-
     const retrieveUserLobbyMaze = async () => {
       try {
         // if (!lobbyHashParam) throw new Error('lobbyHashParam missing')
         if (userLobbyHashParam) {
-          console.log('USER LOBBY HASH EFFECT > lobbyHashParam: ' + userLobbyHashParam)
           const maze = await getUserLobbyMazeByHash(userLobbyHashParam)
-          console.log('USER LOBBY HASH EFFECT > RETRIEVE > maze:')
-          console.log(maze)
           setMazeString(maze.maze_string)
           setPrompt(maze.lobby_prompt)
           setNumSamples(maze.num_samples)
@@ -210,13 +200,9 @@ const Lobby = props => {
 
   // Real-time Stats Effect
   useEffect(() => {
-    console.log('HOMEPAGE > USER COUNT EFFECT')
-
     const retrieveNumUsersInLobby = async () => {
       try {
         const count = await getNumUsersInLobby(lobbyCode)
-        // console.log('HOMEPAGE > USER COUNT EFFECT > userCount:')
-        // console.log(count)
         setNumUsersInLobby(count)
       } catch (err) {
         console.error(err)
@@ -232,7 +218,6 @@ const Lobby = props => {
           const data = []
           for (let i = 0; i < usersInLobby.length; i++) {
             const worker = usersInLobby[i]
-            console.log(worker)
 
             const actions = worker.user_lobby_actions
 
@@ -242,7 +227,6 @@ const Lobby = props => {
             }
           }
           setSampleData(data)
-          console.log(data)
 
           setWorkers(usersInLobby)
           setWorkersLoading(false)
@@ -256,7 +240,6 @@ const Lobby = props => {
       // Given the current number of refreshes, update the refresh count
       setRefreshCount(refreshes => {
         if (refreshes < maxRefreshes) {
-          console.log('REFRESH COUNT: ' + (refreshes + +1))
           retrieveNumUsersInLobby()
           retrieveLobbyUsersAndActions()
           return refreshes + 1
@@ -292,9 +275,6 @@ const Lobby = props => {
       }
     })
   }
-
-  // console.log('LOBBY BEFORE RETURN')
-  // console.log(`lobbyId: ${lobbyId}`)
 
   return (
     <div className={classes.root}>

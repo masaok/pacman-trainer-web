@@ -32,11 +32,9 @@ const generateRandomInteger = (min, max) => {
 
 const randomizeMazePlayers = mazeString => {
   const array = mazeStringToArray(mazeString)
-  // console.log(array)
   const newArray = randomizeMazeArrayPlayers(array)
 
   const newString = mazeArrayToString(newArray)
-  // console.log(newString)
 
   return newString
 }
@@ -45,12 +43,10 @@ const randomizeMazePlayers = mazeString => {
 const mazeStringToArray = mazeString => {
   const result = []
   const rowStrings = mazeString.trim().split('\n')
-  // console.log(rowStrings)
 
   rowStrings.forEach(string => {
     result.push(string.split(''))
   })
-  // console.log(result)
   return result
 }
 
@@ -79,9 +75,6 @@ const randomizeMazeArrayPlayers = mazeArray => {
   const height = mazeArray.length
   const width = mazeArray[0].length
 
-  // console.log('HEIGHT: ' + height)
-  // console.log('WIDTH: ' + width)
-
   const used = {}
 
   // Loop through all keys (pacman, ghosts, etc) in Player Counter
@@ -97,8 +90,6 @@ const randomizeMazeArrayPlayers = mazeArray => {
         // Generate coordinates
         const y = generateRandomInteger(0, height)
         const x = generateRandomInteger(0, width)
-
-        // console.log(`Y: ${y}, X: ${x}`)
 
         // Keep tracked of "used" coordinates to not overwrite previous placements
         const usedKey = `${y}-${x}`

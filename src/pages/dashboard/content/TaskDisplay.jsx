@@ -41,10 +41,6 @@ const TaskDisplay = props => {
 
   const [seed, setSeed] = useState(Math.random())
 
-  useEffect(() => {
-    console.log('TASK > FIRST LOAD EFFECT')
-  }, [])
-
   const handleNewMazeClick = () => {
     setSeed(Math.random())
   }
