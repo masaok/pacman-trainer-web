@@ -399,7 +399,7 @@ const Homepage = props => {
       <div className={classes.topPanels}>
         {/* Name Panel */}
         <Paper className={classes.namePanel}>
-          <Typography className={classes.panelTitle}>Your Name</Typography>
+          <Typography className={classes.panelTitle}>Worker Name</Typography>
           <TextField
             className={clsx(classes.field, classes.nameField)}
             label="Type your display name"
