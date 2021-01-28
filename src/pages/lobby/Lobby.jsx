@@ -377,7 +377,7 @@ const Lobby = props => {
                             <CSVLink
                               className={classes.cullAllSamplesLink}
                               data={sampleData}
-                              filename={`sample_from_all_workers_in_lobby_${lobbyCode}_${lobbyId}.csv`}
+                              filename={`samples_from_all_workers_in_lobby_${lobbyCode}_${lobbyId}.csv`}
                             >
                               Cull All Samples
                             </CSVLink>
