@@ -1,6 +1,6 @@
 {
-  "short_name": "Pacman Trainer",
-  "name": "Pacman Trainer and Learner",
+  "short_name": "Pacman Imitation Learning",
+  "name": "Pacman Imitation Learning Tool",
   "icons": [
     {
       "src": "favicon.ico",
