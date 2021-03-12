@@ -3,7 +3,7 @@ import { isDev } from './common'
 // TODO: PROD - Vercel
 // TODO: DEV - localhost:4000
 
-const api = isDev() ? 'http://localhost:4000/' : 'https://pacman-trainer-api.masaok.vercel.app/'
+const api = isDev() ? 'http://localhost:4000/' : 'https://api.pacmantrain.com/'
 
 const BASE_API_REQUEST_HEADER = {
   'Content-Type': 'application/json',
